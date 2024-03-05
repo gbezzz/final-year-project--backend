@@ -5,5 +5,4 @@ from django.contrib.auth.models import AbstractUser
 
 
 class CustomUser(AbstractUser):
-    # add additional fields in here
-    pass
+    name = models.CharField(null=True, blank=True, max_length=100)
