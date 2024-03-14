@@ -17,10 +17,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 class CustomRegisterSerializer(RegisterSerializer):
     CHOICES = (
-        ("nurse", "Nurse"),
+        ("admin", "Admin"),
         ("doctor", "Doctor"),
-        ("lab", "Lab Personnel"),
-        ("pharmacist", "Pharmacist"),
     )
     role = serializers.ChoiceField(choices=CHOICES)
 
