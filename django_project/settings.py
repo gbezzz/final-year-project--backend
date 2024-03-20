@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     # Local apps
     "accounts.apps.AccountsConfig",
+    "recommendations.apps.RecommendationsConfig",
     # 3rd-party apps
+    "django_extensions",
     "rest_framework",
     "corsheaders",
     "rest_framework.authtoken",
