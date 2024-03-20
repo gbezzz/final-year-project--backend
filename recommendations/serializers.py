@@ -19,4 +19,25 @@ class PatientSerializer(serializers.ModelSerializer):
 class DiagnoseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Diagnose
-        fields = ["patient", "doctor", "diagnosis_made"]
+        fields = [
+            "patient",
+            "doctor",
+            "diagnosis_made",
+            "doctor_name",
+            "doctor_email",
+            "doctor_phone",
+        ]
+
+
+class ReportSerializer(serializers.ModelSerializer):
+    patient = PatientSerializer(read_only=True)
+
+    class Meta:
+        model = Diagnose
+        fields = [
+            "patient",
+            "diagnosis_made",
+            "doctor_name",
+            "doctor_phone",
+            "doctor_email",
+        ]
