@@ -29,6 +29,7 @@ class Diagnose(models.Model):
     doctor_name = models.CharField(max_length=75)
     doctor_phone = models.CharField(max_length=15)
     doctor_email = models.EmailField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
         self.doctor_name = f"{self.doctor.first_name} {self.doctor.last_name}"
