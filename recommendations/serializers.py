@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import Patient, Diagnose
-from django.utils.timesince import timesince
 
 
 class PatientSerializer(serializers.ModelSerializer):
@@ -18,17 +17,12 @@ class PatientSerializer(serializers.ModelSerializer):
 
 
 class DiagnoseSerializer(serializers.ModelSerializer):
-    created_at = serializers.SerializerMethodField()
-
     class Meta:
         model = Diagnose
         fields = [
             "patient",
             "doctor",
             "diagnosis_made",
-            "doctor_name",
-            "doctor_email",
-            "doctor_phone",
             "created_at",
         ]
 
@@ -38,6 +32,9 @@ class DiagnoseSerializer(serializers.ModelSerializer):
 
 class ReportSerializer(serializers.ModelSerializer):
     patient = PatientSerializer(read_only=True)
+    doctor_name = serializers.CharField(source="doctor.get_full_name", read_only=True)
+    doctor_phone = serializers.CharField(source="doctor.phone_number", read_only=True)
+    doctor_email = serializers.EmailField(source="doctor.email", read_only=True)
     created_at = serializers.SerializerMethodField()
 
     class Meta:
