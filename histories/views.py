@@ -9,12 +9,5 @@ from rest_framework.permissions import IsAuthenticated
 
 class HistoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = History.objects.all()
-
-    def get_queryset(self):
-
-        if self.request.user.is_superuser:
-            return History.objects.all()
-        return History.objects.filter(doctor=self.request.user)
-
     serializer_class = HistorySerializer
-    permission_classes = IsAuthenticated
+    permission_classes = [IsAuthenticated]

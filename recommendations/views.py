@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
-    permission_classes = IsAuthenticated
+    permission_classes = [IsAuthenticated]
 
 
 class DiagnoseViewSet(viewsets.ModelViewSet):
@@ -22,7 +22,7 @@ class DiagnoseViewSet(viewsets.ModelViewSet):
         return Diagnose.objects.filter(doctor=self.request.user)
 
     serializer_class = DiagnoseSerializer
-    permission_classes = IsAuthenticated
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         # Set the doctor's details from the request user
@@ -44,4 +44,4 @@ class ReportViewSet(viewsets.ReadOnlyModelViewSet):
         return Diagnose.objects.filter(doctor=self.request.user)
 
     serializer_class = ReportSerializer
-    permission_classes = IsAuthenticated
+    permission_classes = [IsAuthenticated]
