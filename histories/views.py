@@ -6,6 +6,6 @@ from .serializers import HistorySerializer
 # Create your views here.
 
 
-class HistoryViewSet(viewsets.ModelViewSet):
+class HistoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = History.objects.all()
     serializer_class = HistorySerializer

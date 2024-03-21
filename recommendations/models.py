@@ -10,8 +10,8 @@ from django.dispatch import receiver
 
 
 class Patient(models.Model):
-    def full_name(self, obj):
-        return f"{obj.first_name} {obj.last_name}"
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
 
     last_name = models.CharField(max_length=100)
     first_name = models.CharField(max_length=100)

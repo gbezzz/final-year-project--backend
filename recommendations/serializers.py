@@ -31,7 +31,13 @@ class DiagnoseSerializer(serializers.ModelSerializer):
 
 
 class ReportSerializer(serializers.ModelSerializer):
-    patient = PatientSerializer(read_only=True)
+    patient_last_name = serializers.CharField(source="patient.last_name")
+    patient_first_name = serializers.CharField(source="patient.first_name")
+    patient_sex = serializers.CharField(source="patient.sex")
+    patient_age = serializers.IntegerField(source="patient.age")
+    patient_phone_number = serializers.CharField(source="patient.phone_number")
+    patient_email = serializers.EmailField(source="patient.email")
+    patient_address = serializers.CharField(source="patient.address")
     doctor_name = serializers.CharField(source="doctor.get_full_name", read_only=True)
     doctor_phone = serializers.CharField(source="doctor.phone_number", read_only=True)
     doctor_email = serializers.EmailField(source="doctor.email", read_only=True)
@@ -40,7 +46,13 @@ class ReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Diagnose
         fields = [
-            "patient",
+            "patient_last_name",
+            "patient_first_name",
+            "patient_sex",
+            "patient_age",
+            "patient_phone_number",
+            "patient_email",
+            "patient_address",
             "diagnosis_made",
             "doctor_name",
             "doctor_phone",
