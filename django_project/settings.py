@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # Local apps
     "accounts.apps.AccountsConfig",
     "recommendations.apps.RecommendationsConfig",
+    "histories.apps.HistoriesConfig",
     # 3rd-party apps
     "django_extensions",
     "rest_framework",
