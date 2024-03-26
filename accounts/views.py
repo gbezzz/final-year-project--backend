@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets
 from .serializers import UserSerializer
+
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework import generics
 from dj_rest_auth.views import LoginView as BaseLoginView
@@ -28,6 +29,7 @@ class LoginView(BaseLoginView):
 class RegisterView(BaseRegisterView):
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
+        response.data["message"] = "Registration successful!"
         # Remove the token created by dj-rest-auth automatically from the response
         if "key" in response.data:
             del response.data["key"]
@@ -45,6 +47,7 @@ class UserDetail(generics.RetrieveDestroyAPIView):
 
     def get_queryset(self):
         user = self.request.user
+
         if user.is_superuser:
             return get_user_model().objects.all()
         else:

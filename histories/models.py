@@ -11,7 +11,7 @@ class History(models.Model):
     doctor_name = models.CharField(max_length=75, default="")
     doctor_email = models.EmailField(default="")
     doctor_phone = models.CharField(max_length=15, default="")
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
 
     def __str__(self):
         return f"Report for {self.diagnose.patient.first_name} {self.diagnose.patient.last_name} by Dr. {self.diagnose.doctor_name}"

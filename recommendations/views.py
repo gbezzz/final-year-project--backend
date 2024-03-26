@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from .models import Patient, Diagnose
 from .serializers import PatientSerializer, DiagnoseSerializer, ReportSerializer
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 # Create your views here.
 
