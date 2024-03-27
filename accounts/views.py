@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets
 from .serializers import UserSerializer
-
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework import generics
 from dj_rest_auth.views import LoginView as BaseLoginView
