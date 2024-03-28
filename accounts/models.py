@@ -19,3 +19,5 @@ class CustomUser(AbstractUser):
     gender = models.CharField(
         max_length=1, choices=GENDER_CHOICES, default="Gender not specified"
     )
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    updated_at = models.DateTimeField(auto_now=True, editable=False)
