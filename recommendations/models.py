@@ -1,6 +1,7 @@
 from django.db import models
 from accounts.models import CustomUser
-from django.core.validators import MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
+from datetime import date
 
 # Create your models here.
 
@@ -13,7 +14,32 @@ class Patient(models.Model):
         ("F", "Female"),
     )
     sex = models.CharField(max_length=1, choices=SEX_CHOICES)
-    age = models.IntegerField(validators=[MaxValueValidator(150)])
+    date_of_birth = models.DateField()
+
+    @property
+    def age(self):
+        today = date.today()
+        years = (
+            today.year
+            - self.date_of_birth.year
+            - (
+                (today.month, today.day)
+                < (self.date_of_birth.month, self.date_of_birth.day)
+            )
+        )
+        months = (
+            today.month
+            - self.date_of_birth.month
+            - (today.day < self.date_of_birth.day)
+        ) % 12
+        days = (today.day - self.date_of_birth.day) % 30  # This is an approximation
+        return f"{years} years, {months} months, and {days} days"
+
+    weight = models.DecimalField(
+        match_digits=5,
+        decimal_places=2,
+        validators=[MinValueValidator(0), MaxValueValidator(250)],
+    )
     phone_number = models.CharField(max_length=15)
     email = models.EmailField()
     address = models.TextField()

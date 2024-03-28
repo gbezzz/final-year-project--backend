@@ -4,12 +4,15 @@ from django.utils.timesince import timesince
 
 
 class PatientSerializer(serializers.ModelSerializer):
+    age = serializers.CharField(read_only=True)
+
     class Meta:
         model = Patient
         fields = [
             "last_name",
             "first_name",
             "sex",
+            "date_of_birth",
             "age",
             "phone_number",
             "email",
