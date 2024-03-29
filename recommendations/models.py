@@ -6,7 +6,8 @@ from django.core.validators import MaxValueValidator
 from histories.models import History
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
+import string
+import random
 
 # Create your models here.
 
@@ -17,6 +18,19 @@ class Patient(models.Model):
 
     last_name = models.CharField(max_length=100)
     first_name = models.CharField(max_length=100)
+    patient_id = models.CharField(max_length=8, unique=True)
+
+    def generate_patient_id(self):
+        characters = string.ascii_uppercase + string.ascii_lowercase + string.digits
+        return "".join(random.choice(characters) for _ in range(8))
+
+    def save(self, *args, **kwargs):
+        if not self.patient_id:
+            self.patient_id = self.generate_patient_id()
+            while Patient.objects.filter(patient_id=self.patient_id).exists():
+                self.patient_id = self.generate_patient_id()
+        super().save(*args, **kwargs)
+
     SEX_CHOICES = (
         ("M", "Male"),
         ("F", "Female"),
@@ -41,10 +55,10 @@ class Patient(models.Model):
             - (today.day < self.date_of_birth.day)
         ) % 12
         days = (today.day - self.date_of_birth.day) % 30  # This is an approximation
-        return f"{years} years, {months} months, and {days} days"
+        return {"years": years, "months": months, "days": days}
 
     weight = models.DecimalField(
-        match_digits=5,
+        max_digits=5,
         decimal_places=2,
         validators=[MinValueValidator(0), MaxValueValidator(250)],
     )
@@ -81,6 +95,7 @@ def create_history(sender, instance, created, **kwargs):
     if created:
         History.objects.create(
             patient=instance.patient,
+            patient_id=instance.patient_id,
             diagnose=instance,
             diagnosis_made=instance.diagnosis_made,
             doctor_name=instance.doctor_name,

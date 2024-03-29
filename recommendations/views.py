@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from .models import Patient, Diagnose
 from .serializers import PatientSerializer, DiagnoseSerializer, ReportSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -11,6 +11,13 @@ class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = [
+        "first_name",
+        "last_name",
+        "email",
+        "phone_number",
+    ]
 
 
 class DiagnoseViewSet(viewsets.ModelViewSet):
@@ -45,3 +52,14 @@ class ReportViewSet(viewsets.ReadOnlyModelViewSet):
 
     serializer_class = ReportSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = [
+        "patient_last_name",
+        "patient_first_name",
+        "patient_age",
+        "patient_phone_number",
+        "patient_email",
+        "patient_address",
+        "diagnosis_made",
+        "doctor_name",
+    ]

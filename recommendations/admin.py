@@ -9,11 +9,17 @@ class PatientAdmin(admin.ModelAdmin):
     list_display = (
         "full_name",
         "sex",
-        "age",
+        "display_age",
         "phone_number",
         "email",
         "address",
     )
+
+    def display_age(self, obj):
+        age = obj.age
+        return f"{age['years']} years, {age['months']} months, and {age['days']} days"
+
+    display_age.short_description = "Age"
 
 
 class DiagnoseAdmin(admin.ModelAdmin):
