@@ -26,6 +26,7 @@ class DiagnoseAdmin(admin.ModelAdmin):
     list_display = (
         "patient",
         "doctor",
+        "diagnosis_id",
         "diagnosis_made",
         "doctor_name",
         "doctor_email",

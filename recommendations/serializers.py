@@ -4,10 +4,12 @@ from .models import Patient, Diagnose
 
 class PatientSerializer(serializers.ModelSerializer):
     age = serializers.SerializerMethodField()
+    patient_id = serializers.CharField(source="pid", read_only=True)
 
     class Meta:
         model = Patient
         fields = [
+            "id",
             "patient_id",
             "last_name",
             "first_name",
@@ -40,7 +42,7 @@ class DiagnoseSerializer(serializers.ModelSerializer):
 
 
 class ReportSerializer(serializers.ModelSerializer):
-    patient_id = serializers.CharField(source="patient.patient_id")
+    patient_id = serializers.CharField(source="patient.pid")
     patient_last_name = serializers.CharField(source="patient.last_name")
     patient_first_name = serializers.CharField(source="patient.first_name")
     patient_sex = serializers.CharField(source="patient.sex")
@@ -64,6 +66,7 @@ class ReportSerializer(serializers.ModelSerializer):
             "patient_phone_number",
             "patient_email",
             "patient_address",
+            "diagnosis_id",
             "diagnosis_made",
             "doctor_name",
             "doctor_phone",

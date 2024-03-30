@@ -16,20 +16,14 @@ class Patient(models.Model):
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
 
+    id = models.AutoField(primary_key=True)
+
+    @property
+    def pid(self):
+        return "PID" + str(self.id).zfill(7)
+
     last_name = models.CharField(max_length=100)
     first_name = models.CharField(max_length=100)
-    patient_id = models.CharField(max_length=8, unique=True)
-
-    def generate_patient_id(self):
-        characters = string.ascii_uppercase + string.ascii_lowercase + string.digits
-        return "".join(random.choice(characters) for _ in range(8))
-
-    def save(self, *args, **kwargs):
-        if not self.patient_id:
-            self.patient_id = self.generate_patient_id()
-            while Patient.objects.filter(patient_id=self.patient_id).exists():
-                self.patient_id = self.generate_patient_id()
-        super().save(*args, **kwargs)
 
     SEX_CHOICES = (
         ("M", "Male"),
@@ -73,6 +67,12 @@ class Patient(models.Model):
 class Diagnose(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     doctor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+
+    def generate_diagnosis_id(self):
+        characters = string.ascii_uppercase + string.ascii_lowercase + string.digits
+        return "".join(random.choice(characters) for _ in range(8))
+
+    diagnosis_id = models.CharField(max_length=8, unique=True)
     diagnosis_made = models.TextField()
     doctor_name = models.CharField(max_length=75)
     doctor_phone = models.CharField(max_length=15)
@@ -83,6 +83,10 @@ class Diagnose(models.Model):
         self.doctor_name = f"{self.doctor.first_name} {self.doctor.last_name}"
         self.doctor_phone = f"{self.doctor.phone_number}"
         self.doctor_email = f"{self.doctor.email}"
+        if not self.diagnosis_id:
+            self.diagnosis_id = self.generate_diagnosis_id()
+            while Diagnose.objects.filter(diagnosis_id=self.diagnosis_id).exists():
+                self.diagnosis_id = self.generate_diagnosis_id()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -96,6 +100,7 @@ def create_history(sender, instance, created, **kwargs):
         History.objects.create(
             patient=instance.patient,
             patient_id=instance.patient_id,
+            diagnosis_id=instance.diagnosis_id,
             diagnose=instance,
             diagnosis_made=instance.diagnosis_made,
             doctor_name=instance.doctor_name,
