@@ -17,6 +17,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from dj_rest_auth.views import PasswordResetConfirmView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -28,6 +29,11 @@ urlpatterns = [
     path("api-auth/", include("rest_framework.urls")),
     path("api/dj-rest-auth/", include("dj_rest_auth.urls")),
     path("api/dj-rest-auth/registration/", include("dj_rest_auth.registration.urls")),
+    path(
+        "password/reset/confirm/<uidb64>/<token>/",
+        PasswordResetConfirmView.as_view(),
+        name="password_reset_confirm",
+    ),
     path("api/recommendations/", include("recommendations.urls")),
     path("api/report-history/", include("histories.urls")),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
