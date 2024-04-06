@@ -13,9 +13,9 @@ class HistoryViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.SearchFilter]
     search_fields = [
-        "patient_last_name",
-        "patient_first_name",
-        "patient_phone_number",
-        "patient_email",
+        "patient__last_name",
+        "patient__first_name",
+        "patient__phone_number",
+        "patient__email",
         "doctor_name",
     ]

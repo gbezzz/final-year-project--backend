@@ -54,12 +54,11 @@ class ReportViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.SearchFilter]
     search_fields = [
-        "patient_last_name",
-        "patient_first_name",
-        "patient_age",
-        "patient_phone_number",
-        "patient_email",
-        "patient_address",
+        "patient__last_name",
+        "patient__first_name",
+        "patient__phone_number",
+        "patient__email",
+        "patient__address",
         "diagnosis_made",
         "doctor_name",
     ]
