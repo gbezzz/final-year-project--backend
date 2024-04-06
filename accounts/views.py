@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth import get_user_model
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from .serializers import UserSerializer
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework import generics
@@ -39,6 +39,12 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAdminUser]
+    filter_backends = [filters.SearchFilter]
+    search_fields = [
+        "first_name",
+        "last_name",
+        "phone_number",
+    ]
 
 
 class UserDetail(generics.RetrieveDestroyAPIView):
