@@ -18,7 +18,7 @@ class OrthodoxDrugViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = OrthodoxDrug.objects.all()
     serializer_class = OrthodoxDrugSerializer
     filter_backends = [filters.SearchFilter]
-    search_fields = ['name', 'state', ...]
+    search_fields = ['name', 'state']
 
 
     def get_queryset(self):
@@ -37,4 +37,4 @@ class TraditionalDrugViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = TraditionalDrug.objects.all()
     serializer_class = TraditionalDrugSerializer
     filter_backends = [filters.SearchFilter]
-    search_fields = ['name', ...]
+    search_fields = ['name']

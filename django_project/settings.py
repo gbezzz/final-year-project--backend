@@ -113,7 +113,7 @@ DATABASES = {
         "NAME": 'sample_medicines',
         'ENFORCE_SCHEMA': False,
       'CLIENT': {
-           'host': 'mongodb+srv://Josh:kozaYq63yQPeedwG@cluster0.iqe8x2k.mongodb.net/'
+           'host': 'mongodb+srv://Josh:kozaYq63yQPeedwG@cluster0.jcyy0cu.mongodb.net/'
         }
     }
  }
