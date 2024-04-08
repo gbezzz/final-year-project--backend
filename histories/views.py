@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from .models import History
 from .serializers import HistorySerializer
 from rest_framework.permissions import IsAuthenticated
-
+from djongo import models
 # Create your views here.
 
 

@@ -1,6 +1,8 @@
-from django.urls import path, include
-from . import views
+'''from django.urls import path, include
+from .views import DrugListAPIView
 
 urlpatterns = [
-    path("",views.general_drug_information,name="general_drug_information"),
+    path("", DrugListAPIView.as_view(), name="drugInfo"),
+   
 ]
+'''

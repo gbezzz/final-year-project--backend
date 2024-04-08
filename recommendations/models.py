@@ -4,7 +4,7 @@ from django.core.validators import MaxValueValidator
 from histories.models import History
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
+from djongo import models
 
 # Create your models here.
 
