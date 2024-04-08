@@ -1,8 +1,11 @@
-'''from django.urls import path, include
-from .views import DrugListAPIView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import OrthodoxDrugViewSet, TraditionalDrugViewSet
+
+router = DefaultRouter()
+router.register(r"orthodox-drug", OrthodoxDrugViewSet, basename="orthodox-drug")
+router.register(r"traditional-drug", TraditionalDrugViewSet, basename="traditional-drug")
 
 urlpatterns = [
-    path("", DrugListAPIView.as_view(), name="drugInfo"),
-   
+    path("", include(router.urls)),
 ]
-'''

@@ -26,6 +26,6 @@ urlpatterns = [
     path("api/dj-rest-auth/registration/", include("dj_rest_auth.registration.urls")),
     path("api/recommendations/", include("recommendations.urls")),
     path("api/report-history/", include("histories.urls")),
-   # path("api/drug-info/", include("drugInfo.urls")),
+    path("api/drug-info/", include("drugInfo.urls")),
 
 ]
