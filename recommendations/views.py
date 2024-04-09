@@ -3,6 +3,7 @@ from rest_framework import viewsets, filters
 from .models import Patient, Diagnose
 from .serializers import PatientSerializer, DiagnoseSerializer, ReportSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 # Create your views here.
 

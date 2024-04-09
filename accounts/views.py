@@ -7,7 +7,7 @@ from rest_framework import generics
 from dj_rest_auth.views import LoginView as BaseLoginView
 from dj_rest_auth.registration.views import RegisterView as BaseRegisterView
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 # Create your views here.
 
