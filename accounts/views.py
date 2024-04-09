@@ -18,7 +18,7 @@ class LoginView(BaseLoginView):
         refresh = RefreshToken.for_user(self.user)
         original_response.data["access"] = str(refresh.access_token)
         original_response.data["refresh"] = str(refresh)
-
+        response.data["message"] = "Successfully Logged In!"
         # Remove the token created by dj-rest-auth automatically from the response
         if "key" in original_response.data:
             del original_response.data["key"]

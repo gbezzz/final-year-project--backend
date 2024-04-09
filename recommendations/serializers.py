@@ -22,7 +22,7 @@ class PatientSerializer(serializers.ModelSerializer):
             "address",
         ]
 
-    def get_age(self, obj):
+    def get_age(self, obj) -> str:
         age = obj.age
         return f"{age['years']} years, {age['months']} months, and {age['days']} days"
 
@@ -74,9 +74,9 @@ class ReportSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
-    def get_created_at(self, instance):
+    def get_created_at(self, instance) -> str:
         return instance.created_at.strftime("%B %d, %Y, %H:%M")
 
-    def get_patient_age(self, obj):
+    def get_patient_age(self, obj) -> str:
         age = obj.patient.age
         return f"{age['years']} years, {age['months']} months, and {age['days']} days"
