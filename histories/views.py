@@ -3,8 +3,12 @@ from rest_framework import viewsets, filters
 from .models import History
 from .serializers import HistorySerializer
 from rest_framework.permissions import IsAuthenticated
+<<<<<<< HEAD
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+=======
+from djongo import models
+>>>>>>> general-information
 # Create your views here.
 
 

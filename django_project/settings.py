@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -31,6 +33,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    
+   # "socialaccount",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -42,6 +46,8 @@ INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",
     "recommendations.apps.RecommendationsConfig",
     "histories.apps.HistoriesConfig",
+    "drugInfo.apps.DrugInfoConfig",
+
     # 3rd-party apps
     "django_extensions",
     "rest_framework",
@@ -50,9 +56,13 @@ INSTALLED_APPS = [
     "dj_rest_auth",
     "allauth",
     "allauth.account",
-    "allauth.socialaccount",
+    #"allauth.socialaccount",
     "dj_rest_auth.registration",
+<<<<<<< HEAD
     "drf_spectacular",
+=======
+    "djongo",
+>>>>>>> general-information
 ]
 
 MIDDLEWARE = [
@@ -96,12 +106,23 @@ WSGI_APPLICATION = "django_project.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    "default": {
+   "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
+        
+    },
 
+    'mongodb': {
+        'ENGINE': 'djongo',
+        "NAME": 'sample_medicines',
+        'ENFORCE_SCHEMA': False,
+      'CLIENT': {
+           'host': 'mongodb+srv://Josh:kozaYq63yQPeedwG@cluster0.jcyy0cu.mongodb.net/'
+        }
+    }
+ }
+
+#mongodb://localhost:27017/
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -121,6 +142,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+DATABASE_ROUTERS = ['drugInfo.dbrouters.MyDBRouter']
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -171,9 +193,14 @@ REST_AUTH_REGISTER_SERIALIZERS = {
     "REGISTER_SERIALIZER": "accounts.serializers.CustomRegisterSerializer",
 }
 
+<<<<<<< HEAD
 SPECTACULAR_SETTINGS = {
     "TITLE": " CDSS API",
     "DESCRIPTION": "Endpoints for the Orthodox & Traditional Drug CDSS API",
     "VERSION": "1.0.0",
     # OTHER SETTINGS
 }
+=======
+
+
+>>>>>>> general-information

@@ -37,12 +37,21 @@ urlpatterns = [
     ),
     path("api/recommendations/", include("recommendations.urls")),
     path("api/report-history/", include("histories.urls")),
+
+    path("api/drug-info/", include("drugInfo.urls")),
+
+
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+<<<<<<< HEAD
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "api/schema/redoc/",
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
+=======
+    path("api/drug-info/", include("drugInfo.urls")),
+
+>>>>>>> general-information
 ]

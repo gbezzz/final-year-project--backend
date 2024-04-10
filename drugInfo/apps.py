@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class drugInfoConfig(AppConfig):
+class DrugInfoConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'drugInfo'
