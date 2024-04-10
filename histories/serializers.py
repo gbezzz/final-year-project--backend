@@ -28,6 +28,7 @@ class HistorySerializer(serializers.ModelSerializer):
             "diagnose",
             "diagnosis_id",
             "diagnosis_made",
+            "selected_drug",
             "doctor_name",
             "doctor_email",
             "doctor_phone",

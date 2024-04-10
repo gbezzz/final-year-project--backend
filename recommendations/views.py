@@ -1,18 +1,25 @@
 from django.shortcuts import render
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, serializers
 from .models import Patient, Diagnose
-from .serializers import PatientSerializer, DiagnoseSerializer, ReportSerializer
+from .serializers import (
+    PatientSerializer,
+    DiagnoseSerializer,
+    ReportSerializer,
+    DrugSerializer,
+)
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import (
     api_view,
     authentication_classes,
     permission_classes,
+    action,
 )
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from drugInfo.models import OrthodoxDrug, TraditionalDrug
-from drugInfo.serializers import OrthodoxDrugSerializer, TraditionalDrugSerializer
+
 
 # Create your views here.
 
@@ -44,17 +51,64 @@ class DiagnoseViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # Set the doctor's details from the request user
         user = self.request.user
+        orthodox_drug_ids = self.request.data.get("orthodox_drug_ids", "").split(",")
+        traditional_drug_ids = self.request.data.get("traditional_drug_ids", "").split(
+            ","
+        )
+
+        # Validate that the provided drug IDs exist in the database
+        if not all(
+            OrthodoxDrug.objects.filter(id=id).exists() for id in orthodox_drug_ids
+        ):
+            raise ValidationError("One or more orthodox drug IDs do not exist.")
+        if not all(
+            TraditionalDrug.objects.filter(id=id).exists()
+            for id in traditional_drug_ids
+        ):
+            raise ValidationError("One or more traditional drug IDs do not exist.")
+
         serializer.save(
             doctor_name=user.get_full_name(),
             doctor_phone=user.phone_number,
             doctor_email=user.email,
+            orthodox_drug_ids=",".join(orthodox_drug_ids),
+            traditional_drug_ids=",".join(traditional_drug_ids),
         )
+
+    @action(detail=True, methods=["post"])
+    def select_drugs(self, request, pk=None):
+        selected_orthodox_drug_ids = request.data.get("selected_orthodox_drug_ids", [])
+        selected_traditional_drug_ids = request.data.get(
+            "selected_traditional_drug_ids", []
+        )
+
+        # Validate that the provided drug IDs exist in the database
+        if not all(
+            OrthodoxDrug.objects.filter(id=id).exists()
+            for id in selected_orthodox_drug_ids
+        ):
+            raise ValidationError("One or more orthodox drug IDs do not exist.")
+        if not all(
+            TraditionalDrug.objects.filter(id=id).exists()
+            for id in selected_traditional_drug_ids
+        ):
+            raise ValidationError("One or more traditional drug IDs do not exist.")
+
+        diagnose = self.get_object()
+        diagnose.orthodox_drug_ids = ",".join(map(str, selected_orthodox_drug_ids))
+        diagnose.traditional_drug_ids = ",".join(
+            map(str, selected_traditional_drug_ids)
+        )
+        diagnose.save()
+
+        return Response(self.get_serializer(diagnose).data)
 
 
 # Logic for the Drug Recommendation Tool
 class RecommendDrugsView(APIView):
-    authentication_classes = [JWTAuthentication]
+    # authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    serializer_class = DrugSerializer
 
     def get(self, request):
         # Retrieve the diagnosis and patient ID from the request's query parameters.
@@ -70,7 +124,8 @@ class RecommendDrugsView(APIView):
                 raise NotFound(detail="Patient does not exist")
 
             # Check if the diagnosis exists in the database. If not, raise a NotFound exception.
-            if not Diagnose.objects.filter(name=diagnosis).exists():
+            diagnose = Diagnose.objects.filter(name=diagnosis).first()
+            if not diagnose:
                 raise NotFound(detail="Diagnosis does not exist")
 
             # Retrieve the patient's age, sex, and weight.
@@ -78,10 +133,14 @@ class RecommendDrugsView(APIView):
             sex = patient.sex
             weight = patient.weight
 
-            # Query the OrthodoxDrug and TraditionalDrug models for drugs related to the diagnosis.
-            orthodox_drugs = OrthodoxDrug.objects.filter(diagnosis__icontains=diagnosis)
+            # Retrieve the drugs associated with the diagnosis.
+            orthodox_drug_ids = list(map(int, diagnose.orthodox_drug_ids.split(",")))
+            traditional_drug_ids = list(
+                map(int, diagnose.traditional_drug_ids.split(","))
+            )
+            orthodox_drugs = OrthodoxDrug.objects.filter(id__in=orthodox_drug_ids)
             traditional_drugs = TraditionalDrug.objects.filter(
-                diagnosis__icontains=diagnosis
+                id__in=traditional_drug_ids
             )
 
             # Filter the drugs based on the patient's age, sex, and weight.
@@ -90,14 +149,12 @@ class RecommendDrugsView(APIView):
 
             # Return a response containing the recommended orthodox and traditional drugs. The data is serialized using the OrthodoxDrugSerializer and TraditionalDrugSerializer.
             return Response(
-                {
-                    "orthodox_drugs": OrthodoxDrugSerializer(
-                        orthodox_drugs, many=True
-                    ).data,
-                    "traditional_drugs": TraditionalDrugSerializer(
-                        traditional_drugs, many=True
-                    ).data,
-                }
+                DrugSerializer(
+                    {
+                        "orthodox_drug": orthodox_drugs,
+                        "traditional_drug": traditional_drugs,
+                    }
+                ).data
             )
 
         else:
@@ -131,10 +188,40 @@ class ReportViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Diagnose.objects.all()
 
     def get_queryset(self):
-
         if self.request.user.is_superuser:
             return Diagnose.objects.all()
         return Diagnose.objects.filter(doctor=self.request.user)
+
+    @action(detail=True, methods=["post"])
+    def add_drugs(self, request, pk=None):
+        orthodox_drug_ids = request.data.get("orthodox_drug_ids", "").split(",")
+        traditional_drug_ids = request.data.get("traditional_drug_ids", "").split(",")
+
+        # Validate that the provided drug IDs exist in the database
+        if not all(
+            OrthodoxDrug.objects.filter(id=id).exists() for id in orthodox_drug_ids
+        ):
+            raise ValidationError("One or more orthodox drug IDs do not exist.")
+        if not all(
+            TraditionalDrug.objects.filter(id=id).exists()
+            for id in traditional_drug_ids
+        ):
+            raise ValidationError("One or more traditional drug IDs do not exist.")
+
+        report = self.get_object()
+        report.orthodox_drug_ids = ",".join(orthodox_drug_ids)
+        report.traditional_drug_ids = ",".join(traditional_drug_ids)
+
+        # Get the names of the selected orthodox and traditional drugs
+        orthodox_drugs = OrthodoxDrug.objects.filter(id__in=orthodox_drug_ids)
+        traditional_drugs = TraditionalDrug.objects.filter(id__in=traditional_drug_ids)
+        selected_drugs = [drug.name for drug in orthodox_drugs] + [
+            drug.name for drug in traditional_drugs
+        ]
+        report.selected_drug = ", ".join(selected_drugs)
+        report.save()
+
+        return Response(self.get_serializer(report).data)
 
     serializer_class = ReportSerializer
     permission_classes = [IsAuthenticated]

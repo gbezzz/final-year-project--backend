@@ -10,5 +10,5 @@ router.register(r"reports", ReportViewSet, basename="reports")
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("recommender/", RecommendDrugs.as_views(), name="recommender"),
+    path("recommender/", RecommendDrugsView.as_view(), name="recommender"),
 ]

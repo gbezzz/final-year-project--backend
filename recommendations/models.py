@@ -60,6 +60,9 @@ class Patient(models.Model):
     email = models.EmailField()
     address = models.TextField()
 
+    class Meta:
+        ordering = ["id"]
+
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
@@ -67,6 +70,8 @@ class Patient(models.Model):
 class Diagnose(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     doctor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    orthodox_drug_ids = models.TextField(blank=True)
+    traditional_drug_ids = models.TextField(blank=True)
 
     def generate_diagnosis_id(self):
         characters = string.ascii_uppercase + string.ascii_lowercase + string.digits
@@ -74,6 +79,7 @@ class Diagnose(models.Model):
 
     diagnosis_id = models.CharField(max_length=8, unique=True)
     diagnosis_made = models.TextField()
+    selected_drug = models.CharField(max_length=100)
     doctor_name = models.CharField(max_length=75)
     doctor_phone = models.CharField(max_length=15)
     doctor_email = models.EmailField()
@@ -89,6 +95,9 @@ class Diagnose(models.Model):
                 self.diagnosis_id = self.generate_diagnosis_id()
         super().save(*args, **kwargs)
 
+    class Meta:
+        ordering = ["id"]
+
     def __str__(self):
         return f"Diagnosis for {self.patient.first_name} {self.patient.last_name} by Dr. {self.doctor_name}"
 
@@ -103,6 +112,7 @@ def create_history(sender, instance, created, **kwargs):
             diagnosis_id=instance.diagnosis_id,
             diagnose=instance,
             diagnosis_made=instance.diagnosis_made,
+            selected_drug=instance.selected_drug,
             doctor_name=instance.doctor_name,
             doctor_email=instance.doctor_email,
             doctor_phone=instance.doctor_phone,
