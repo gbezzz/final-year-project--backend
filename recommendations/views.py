@@ -52,7 +52,7 @@ class DiagnoseViewSet(viewsets.ModelViewSet):
 
 
 # Logic for the Drug Recommendation Tool
-class RecommendDrugs(APIView):
+class RecommendDrugsView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
