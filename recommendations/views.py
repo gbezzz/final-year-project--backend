@@ -26,6 +26,7 @@ from drugInfo.models import OrthodoxDrug, TraditionalDrug
 
 class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
+    # authentication_classes = [JWTAuthentication]
     serializer_class = PatientSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.SearchFilter]
@@ -39,14 +40,14 @@ class PatientViewSet(viewsets.ModelViewSet):
 
 class DiagnoseViewSet(viewsets.ModelViewSet):
     queryset = Diagnose.objects.all()
+    # authentication_classes = [JWTAuthentication]
+    serializer_class = DiagnoseSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         if self.request.user.is_superuser:
             return Diagnose.objects.all()
         return Diagnose.objects.filter(doctor=self.request.user)
-
-    serializer_class = DiagnoseSerializer
-    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         # Set the doctor's details from the request user
@@ -77,28 +78,42 @@ class DiagnoseViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def select_drugs(self, request, pk=None):
-        selected_orthodox_drug_ids = request.data.get("selected_orthodox_drug_ids", [])
-        selected_traditional_drug_ids = request.data.get(
-            "selected_traditional_drug_ids", []
-        )
-
-        # Validate that the provided drug IDs exist in the database
-        if not all(
-            OrthodoxDrug.objects.filter(id=id).exists()
-            for id in selected_orthodox_drug_ids
-        ):
-            raise ValidationError("One or more orthodox drug IDs do not exist.")
-        if not all(
-            TraditionalDrug.objects.filter(id=id).exists()
-            for id in selected_traditional_drug_ids
-        ):
-            raise ValidationError("One or more traditional drug IDs do not exist.")
-
         diagnose = self.get_object()
-        diagnose.orthodox_drug_ids = ",".join(map(str, selected_orthodox_drug_ids))
-        diagnose.traditional_drug_ids = ",".join(
-            map(str, selected_traditional_drug_ids)
+        recommend_drugs_view = RecommendDrugsView()
+
+        # Call the get method of RecommendDrugsView with the necessary parameters
+        response = recommend_drugs_view.get(
+            request._request, diagnosis=diagnose.name, patient_id=diagnose.patient.id
         )
+
+        # Get the recommended drugs from the response
+        recommended_drugs = response.data
+
+        # Return the recommended drugs to the user
+        return Response(recommended_drugs)
+
+    @action(detail=True, methods=["post"])
+    def save_selected_drugs(self, request, pk=None):
+        # Get the selected drugs from the request data
+        selected_drugs = request.data.get("selected_drugs", "").split(",")
+
+        # Retrieve the list of recommended drugs
+        diagnose = self.get_object()
+        recommend_drugs_view = RecommendDrugsView()
+        response = recommend_drugs_view.get(
+            request._request, diagnosis=diagnose.name, patient_id=diagnose.patient.id
+        )
+        recommended_drugs = response.data
+
+        # Validate that the selected drugs are in the list of recommended drugs
+        for drug in selected_drugs:
+            if drug not in recommended_drugs:
+                raise ValidationError(
+                    f"{drug} is not in the list of recommended drugs."
+                )
+
+        # Save the selected drugs to the diagnosis
+        diagnose.selected_drug = ", ".join(selected_drugs)
         diagnose.save()
 
         return Response(self.get_serializer(diagnose).data)
@@ -167,10 +182,10 @@ class RecommendDrugsView(APIView):
     def filter_drugs(self, drugs, age, sex, weight):
         filtered_drugs = []
         for drug in drugs:
-            # Extract the age range, sex, and weight range from the drug information. You'll need to replace these lines with the actual code to extract this information from your drug models.
-            drug_age_range = ...  # Extract age range from drug information
-            drug_sex = ...  # Extract sex from drug information
-            drug_weight_range = ...  # Extract weight range from drug information
+            # Extract the drug's properties. You'll need to replace these lines with the actual code to extract this information from your drug models.
+            drug_age_range = drug.age_range
+            drug_sex = drug.sex
+            drug_weight_range = drug.weight_range
 
             # Check if the patient's age, sex, and weight fall within the drug's parameters. If they do, add the drug to the list of filtered drugs.
             if (
@@ -186,6 +201,19 @@ class RecommendDrugsView(APIView):
 
 class ReportViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Diagnose.objects.all()
+    # authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = ReportSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = [
+        "patient__last_name",
+        "patient__first_name",
+        "patient__phone_number",
+        "patient__email",
+        "patient__address",
+        "diagnosis_made",
+        "doctor_name",
+    ]
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -222,16 +250,3 @@ class ReportViewSet(viewsets.ReadOnlyModelViewSet):
         report.save()
 
         return Response(self.get_serializer(report).data)
-
-    serializer_class = ReportSerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = [filters.SearchFilter]
-    search_fields = [
-        "patient__last_name",
-        "patient__first_name",
-        "patient__phone_number",
-        "patient__email",
-        "patient__address",
-        "diagnosis_made",
-        "doctor_name",
-    ]
