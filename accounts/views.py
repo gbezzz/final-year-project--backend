@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets, filters
 from .serializers import UserSerializer
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework import generics
 from dj_rest_auth.views import LoginView as BaseLoginView
 from dj_rest_auth.registration.views import RegisterView as BaseRegisterView
@@ -14,7 +14,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class LoginView(BaseLoginView):
     # authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_response(self):
         original_response = super().get_response()
@@ -30,7 +30,7 @@ class LoginView(BaseLoginView):
 
 class RegisterView(BaseRegisterView):
     # authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
