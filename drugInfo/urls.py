@@ -4,7 +4,9 @@ from .views import OrthodoxDrugViewSet, TraditionalDrugViewSet
 
 router = DefaultRouter()
 router.register(r"orthodox-drug", OrthodoxDrugViewSet, basename="orthodox-drug")
-router.register(r"traditional-drug", TraditionalDrugViewSet, basename="traditional-drug")
+router.register(
+    r"traditional-drug", TraditionalDrugViewSet, basename="traditional-drug"
+)
 
 urlpatterns = [
     path("", include(router.urls)),
