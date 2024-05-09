@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Patient, Diagnose
+from drugInfo.models import OrthodoxDrug, TraditionalDrug
 
 
 class PatientSerializer(serializers.ModelSerializer):
@@ -22,12 +23,15 @@ class PatientSerializer(serializers.ModelSerializer):
             "address",
         ]
 
-    def get_age(self, obj):
+    def get_age(self, obj) -> str:
         age = obj.age
         return f"{age['years']} years, {age['months']} months, and {age['days']} days"
 
 
 class DiagnoseSerializer(serializers.ModelSerializer):
+    orthodox_drugs = serializers.SerializerMethodField()
+    traditional_drugs = serializers.SerializerMethodField()
+
     class Meta:
         model = Diagnose
         fields = [
@@ -35,10 +39,35 @@ class DiagnoseSerializer(serializers.ModelSerializer):
             "doctor",
             "diagnosis_made",
             "created_at",
+            "orthodox_drugs",
+            "traditional_drugs",
         ]
+
+    def get_orthodox_drugs(self, obj) -> list:
+        orthodox_drug_ids = [int(id) for id in obj.orthodox_drug_ids.split(",") if id]
+        orthodox_drugs = OrthodoxDrug.objects.filter(id__in=orthodox_drug_ids)
+        return [drug.name for drug in orthodox_drugs]
+
+    def get_traditional_drugs(self, obj) -> list:
+        traditional_drug_ids = [
+            int(id) for id in obj.traditional_drug_ids.split(",") if id
+        ]
+        traditional_drugs = TraditionalDrug.objects.filter(id__in=traditional_drug_ids)
+        return [drug.name for drug in traditional_drugs]
 
     def get_created_at(self, instance):
         return instance.created_at.strftime("%B %d, %Y, %H:%M")
+
+
+class DrugSerializer(serializers.Serializer):
+    orthodox_drug = serializers.SerializerMethodField()
+    traditional_drug = serializers.SerializerMethodField()
+
+    def get_orthodox_drug(self, obj) -> list:
+        return OrthodoxDrugSerializer(OrthodoxDrug.objects.all(), many=True).data
+
+    def get_traditional_drug(self, obj) -> list:
+        return TraditionalDrugSerializer(TraditionalDrug.objects.all(), many=True).data
 
 
 class ReportSerializer(serializers.ModelSerializer):
@@ -68,15 +97,16 @@ class ReportSerializer(serializers.ModelSerializer):
             "patient_address",
             "diagnosis_id",
             "diagnosis_made",
+            "selected_drug",
             "doctor_name",
             "doctor_phone",
             "doctor_email",
             "created_at",
         ]
 
-    def get_created_at(self, instance):
+    def get_created_at(self, instance) -> str:
         return instance.created_at.strftime("%B %d, %Y, %H:%M")
 
-    def get_patient_age(self, obj):
+    def get_patient_age(self, obj) -> str:
         age = obj.patient.age
         return f"{age['years']} years, {age['months']} months, and {age['days']} days"

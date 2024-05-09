@@ -28,6 +28,7 @@ class HistorySerializer(serializers.ModelSerializer):
             "diagnose",
             "diagnosis_id",
             "diagnosis_made",
+            "selected_drug",
             "doctor_name",
             "doctor_email",
             "doctor_phone",
@@ -40,6 +41,6 @@ class HistorySerializer(serializers.ModelSerializer):
     def get_created_at(self, instance):
         return instance.created_at.strftime("%B %d, %Y, %H:%M")
 
-    def get_patient_age(self, obj):
+    def get_patient_age(self, obj) -> str:
         age = obj.patient.age
         return f"{age['years']} years, {age['months']} months, and {age['days']} days"
