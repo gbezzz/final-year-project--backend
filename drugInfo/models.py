@@ -2,7 +2,7 @@ from django.db import models
 
 
 class OrthodoxDrug(models.Model):
-    id = models.CharField(db_column="_id", primary_key=True, max_length=100)
+    # id = models.CharField(db_column="_id", primary_key=True, max_length=100)
     # drugbank_id = models.ArrayField(
     # models.CharField(max_length=50), db_column="drugbank-id"
     # )[1]

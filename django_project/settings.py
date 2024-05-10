@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -33,8 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    
-   # "socialaccount",
+    # "socialaccount",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -47,7 +45,6 @@ INSTALLED_APPS = [
     "recommendations.apps.RecommendationsConfig",
     "histories.apps.HistoriesConfig",
     "drugInfo.apps.DrugInfoConfig",
-
     # 3rd-party apps
     "django_extensions",
     "rest_framework",
@@ -56,7 +53,7 @@ INSTALLED_APPS = [
     "dj_rest_auth",
     "allauth",
     "allauth.account",
-    #"allauth.socialaccount",
+    # "allauth.socialaccount",
     "dj_rest_auth.registration",
     "djongo",
 ]
@@ -102,23 +99,21 @@ WSGI_APPLICATION = "django_project.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-   "default": {
+    "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
-        
     },
+    "mongodb": {
+        "ENGINE": "djongo",
+        "NAME": "sample_medicines",
+        "ENFORCE_SCHEMA": False,
+        "CLIENT": {
+            "host": "mongodb://mongo:vHaTKDCiGQcxxmQitkviXTNKvGeMGnIT@viaduct.proxy.rlwy.net:59093/"
+        },
+    },
+}
 
-    'mongodb': {
-        'ENGINE': 'djongo',
-        "NAME": 'sample_medicines',
-        'ENFORCE_SCHEMA': False,
-      'CLIENT': {
-           'host': 'mongodb://mongo:vHaTKDCiGQcxxmQitkviXTNKvGeMGnIT@viaduct.proxy.rlwy.net:59093/'
-        }
-    }
- }
-
-#mongodb://localhost:27017/
+# mongodb://localhost:27017/
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -138,7 +133,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-DATABASE_ROUTERS = ['drugInfo.dbrouters.MyDBRouter']
+DATABASE_ROUTERS = ["drugInfo.dbrouters.MyDBRouter"]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -187,6 +182,3 @@ CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
 REST_AUTH_REGISTER_SERIALIZERS = {
     "REGISTER_SERIALIZER": "accounts.serializers.CustomRegisterSerializer",
 }
-
-
-
