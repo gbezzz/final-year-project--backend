@@ -12,26 +12,26 @@ class UserSerializer(serializers.ModelSerializer):
             "username",
             "first_name",
             "last_name",
-            "gender",
-            "role",
-            "phone_number",
+            # "gender",
+            # "role",
+            # "phone_number",
         )
 
 
 class CustomRegisterSerializer(RegisterSerializer):
     first_name = serializers.CharField(max_length=50, required=True)
     last_name = serializers.CharField(max_length=50, required=True)
-    phone_number = serializers.CharField(max_length=15, required=True)
-    GENDER_CHOICES = (
-        ("M", "Male"),
-        ("F", "Female"),
-    )
-    gender = serializers.ChoiceField(choices=GENDER_CHOICES, required=True)
-    CHOICES = (
-        ("admin", "Admin"),
-        ("doctor", "Doctor"),
-    )
-    role = serializers.ChoiceField(choices=CHOICES, required=True)
+    # phone_number = serializers.CharField(max_length=15, required=True)
+    # GENDER_CHOICES = (
+    #     ("M", "Male"),
+    #     ("F", "Female"),
+    # )
+    # gender = serializers.ChoiceField(choices=GENDER_CHOICES, required=True)
+    # CHOICES = (
+    #     ("admin", "Admin"),
+    #     ("doctor", "Doctor"),
+    # )
+    # role = serializers.ChoiceField(choices=CHOICES, required=True)
 
     class Meta:
         model = get_user_model()
@@ -39,8 +39,8 @@ class CustomRegisterSerializer(RegisterSerializer):
             "first_name",
             "last_name",
             "phone_number",
-            "gender",
-            "role",
+            # "gender",
+            # "role",
         )
 
     def get_cleaned_data(self):

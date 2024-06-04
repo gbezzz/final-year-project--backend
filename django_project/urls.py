@@ -22,9 +22,20 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
+
+# from recommendations.views import RecommendTradDrugView
 
 urlpatterns = [
+    # path(
+    #     "api/recommendations/",
+    #     RecommendTradDrugView.as_view(),
+    #     name="recommend-trad-drugs",
+    # ),
     path("admin/", admin.site.urls),
     path("api/users/", include("accounts.urls")),
     path("api-auth/", include("rest_framework.urls")),
@@ -45,6 +56,11 @@ urlpatterns = [
         "api/schema/redoc/",
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
+    ),
+    path(
+        "api/schema/swagger-ui/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
     ),
     path("api/drug-info/", include("drugInfo.urls")),
 ]

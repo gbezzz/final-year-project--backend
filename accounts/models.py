@@ -11,13 +11,13 @@ class CustomUser(AbstractUser):
         ("doctor", "Doctor"),
     )
     role = models.CharField(max_length=10, choices=CHOICES, null=True)
-    phone_number = models.CharField(max_length=15, default="No phone number provided")
+    phone_number = models.CharField(max_length=150, default="0000")
     GENDER_CHOICES = (
         ("M", "Male"),
         ("F", "Female"),
     )
     gender = models.CharField(
-        max_length=1, choices=GENDER_CHOICES, default="Gender not specified"
+        max_length=150, choices=GENDER_CHOICES, default="Gender not specified"
     )
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)

@@ -13,7 +13,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
 class LoginView(BaseLoginView):
-    # authentication_classes = [JWTAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [AllowAny]
 
     def get_response(self):
@@ -29,7 +29,7 @@ class LoginView(BaseLoginView):
 
 
 class RegisterView(BaseRegisterView):
-    # authentication_classes = [JWTAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
@@ -43,7 +43,7 @@ class RegisterView(BaseRegisterView):
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = get_user_model().objects.all()
-    # authentication_classes = [JWTAuthentication]
+    authentication_classes = [JWTAuthentication]
     serializer_class = UserSerializer
     permission_classes = [IsAdminUser]
     filter_backends = [filters.SearchFilter]
@@ -56,7 +56,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class UserDetail(generics.RetrieveDestroyAPIView):
     queryset = get_user_model().objects.all()
-    # authentication_classes = [JWTAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializer
 

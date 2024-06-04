@@ -17,7 +17,7 @@ class CustomUserAdmin(UserAdmin):
         "email",
         "full_name",
         "is_staff",
-        "gender",
+        # "gender",
         "role",
         "phone_number",
     ]

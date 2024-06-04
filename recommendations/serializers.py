@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import Patient, Diagnose
-from drugInfo.models import OrthodoxDrug, TraditionalDrug
+from .models import Patient, Diagnosis, TradDrug
+
+# from drugInfo.models import OrthodoxDrug, TraditionalDrug
 
 
 class PatientSerializer(serializers.ModelSerializer):
@@ -28,46 +29,40 @@ class PatientSerializer(serializers.ModelSerializer):
         return f"{age['years']} years, {age['months']} months, and {age['days']} days"
 
 
-class DiagnoseSerializer(serializers.ModelSerializer):
-    orthodox_drugs = serializers.SerializerMethodField()
-    traditional_drugs = serializers.SerializerMethodField()
+class DiagnosisSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Diagnose
-        fields = [
-            "patient",
-            "doctor",
-            "diagnosis_made",
-            "created_at",
-            "orthodox_drugs",
-            "traditional_drugs",
-        ]
+        model = Diagnosis
+        fields = []
 
-    def get_orthodox_drugs(self, obj) -> list:
-        orthodox_drug_ids = [int(id) for id in obj.orthodox_drug_ids.split(",") if id]
-        orthodox_drugs = OrthodoxDrug.objects.filter(id__in=orthodox_drug_ids)
-        return [drug.name for drug in orthodox_drugs]
+    # def get_orthodox_drugs(self, obj) -> list:
+    #     orthodox_drug_ids = [int(id) for id in obj.orthodox_drug_ids.split(",") if id]
+    #     orthodox_drugs = OrthodoxDrug.objects.filter(id__in=orthodox_drug_ids)
+    #     return [drug.name for drug in orthodox_drugs]
 
-    def get_traditional_drugs(self, obj) -> list:
-        traditional_drug_ids = [
-            int(id) for id in obj.traditional_drug_ids.split(",") if id
-        ]
-        traditional_drugs = TraditionalDrug.objects.filter(id__in=traditional_drug_ids)
-        return [drug.name for drug in traditional_drugs]
+    # def get_trad_drug(self, obj) -> list:
+    #     traditional_drug_ids = [
+    #         int(id) for id in obj.traditional_drug_ids.split(",") if id
+    #     ]
+    #     trad_drug = TradDrug.filter(
+    #         traditional_drug_ids__icontains=traditional_drug_ids
+    #     )
+    #     return [drug.product_name for drug in trad_drug]
 
-    def get_created_at(self, instance):
-        return instance.created_at.strftime("%B %d, %Y, %H:%M")
+    # def get_created_at(self, instance):
+    #     return instance.created_at.strftime("%B %d, %Y, %H:%M")
 
 
-class DrugSerializer(serializers.Serializer):
-    orthodox_drug = serializers.SerializerMethodField()
-    traditional_drug = serializers.SerializerMethodField()
+# class DiagnosisSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Diagnosis
+#         fields = ['id', 'name']
 
-    def get_orthodox_drug(self, obj) -> list:
-        return OrthodoxDrugSerializer(OrthodoxDrug.objects.all(), many=True).data
 
-    def get_traditional_drug(self, obj) -> list:
-        return TraditionalDrugSerializer(TraditionalDrug.objects.all(), many=True).data
+class TradDrugSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TradDrug
+        fields = ["id", "product_name", "disease_indications"]
 
 
 class ReportSerializer(serializers.ModelSerializer):
@@ -85,7 +80,7 @@ class ReportSerializer(serializers.ModelSerializer):
     created_at = serializers.SerializerMethodField()
 
     class Meta:
-        model = Diagnose
+        model = Diagnosis
         fields = [
             "patient_id",
             "patient_last_name",
@@ -95,7 +90,7 @@ class ReportSerializer(serializers.ModelSerializer):
             "patient_phone_number",
             "patient_email",
             "patient_address",
-            "diagnosis_id",
+            "diagnosis_identifier",
             "diagnosis_made",
             "selected_drug",
             "doctor_name",

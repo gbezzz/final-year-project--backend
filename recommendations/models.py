@@ -3,13 +3,32 @@ from accounts.models import CustomUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from datetime import date
 from django.core.validators import MaxValueValidator
-from histories.models import History
+
+# from histories.models import History
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import string
 import random
 
 # Create your models here.
+
+
+# class Diagnosis(models.Model):
+#     diagnosi = models.CharField(max_length=1000)
+
+#     def __str__(self):
+#         return self.name
+
+
+class TradDrug(models.Model):
+    # id = models.AutoField(primary_key=True)
+    product_name = models.CharField(max_length=1000)
+    disease_indications = models.CharField(max_length=100)
+    id = models.CharField(max_length=1000, primary_key=True)
+    # This column holds the diagnosis names it can treat
+
+    def __str__(self):
+        return self.name
 
 
 class Patient(models.Model):
@@ -67,17 +86,17 @@ class Patient(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
-class Diagnose(models.Model):
+class Diagnosis(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     doctor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    orthodox_drug_ids = models.TextField(blank=True)
+    # orthodox_drug_ids = models.TextField(blank=True)
     traditional_drug_ids = models.TextField(blank=True)
 
-    def generate_diagnosis_id(self):
+    def generate_diagnosis_identifier(self):
         characters = string.ascii_uppercase + string.ascii_lowercase + string.digits
         return "".join(random.choice(characters) for _ in range(8))
 
-    diagnosis_id = models.CharField(max_length=8, unique=True)
+    diagnosis_identifier = models.CharField(max_length=8, unique=True)
     diagnosis_made = models.TextField()
     selected_drug = models.CharField(max_length=100)
     doctor_name = models.CharField(max_length=75)
@@ -89,32 +108,33 @@ class Diagnose(models.Model):
         self.doctor_name = f"{self.doctor.first_name} {self.doctor.last_name}"
         self.doctor_phone = f"{self.doctor.phone_number}"
         self.doctor_email = f"{self.doctor.email}"
-        if not self.diagnosis_id:
-            self.diagnosis_id = self.generate_diagnosis_id()
-            while Diagnose.objects.filter(diagnosis_id=self.diagnosis_id).exists():
-                self.diagnosis_id = self.generate_diagnosis_id()
+        if not self.diagnosis_identifier:
+            self.diagnosis_identifier = self.generate_diagnosis_identifier()
+            while Diagnosis.objects.filter(
+                diagnosis_identifier=self.diagnosis_identifier
+            ).exists():
+                self.diagnosis_identifier = self.generate_diagnosis_identifier()
         super().save(*args, **kwargs)
 
     class Meta:
         ordering = ["id"]
 
     def __str__(self):
-        return f"Diagnosis for {self.patient.first_name} {self.patient.last_name} by Dr. {self.doctor_name}"
+        return f"Diagnosis for {self.patient.first_name} {self.patient.last_name} by Dr. {self.doctor_name}: {self.diagnosis_made}"
 
 
 # Signal to create a new History instance after a Diagnose instance is created
-@receiver(post_save, sender=Diagnose)
-def create_history(sender, instance, created, **kwargs):
-    if created:
-        History.objects.create(
-            patient=instance.patient,
-            patient_id=instance.patient_id,
-            diagnosis_id=instance.diagnosis_id,
-            diagnose=instance,
-            diagnosis_made=instance.diagnosis_made,
-            selected_drug=instance.selected_drug,
-            doctor_name=instance.doctor_name,
-            doctor_email=instance.doctor_email,
-            doctor_phone=instance.doctor_phone,
-            created_at=instance.created_at,
-        )
+# @receiver(post_save, sender=Diagnosis)
+# def create_history(sender, instance, created, **kwargs):
+#     if created:
+#         History.objects.create(
+#             patient=instance.patient,
+#             patient_id=instance.patient_id,
+#             diagnose=instance,
+#             diagnosis_made=instance.diagnosis_made,
+#             selected_drug=instance.selected_drug,
+#             doctor_name=instance.doctor_name,
+#             doctor_email=instance.doctor_email,
+#             doctor_phone=instance.doctor_phone,
+#             created_at=instance.created_at,
+#         )
