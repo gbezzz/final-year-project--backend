@@ -19,6 +19,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, ValidationError
 from .models import TradDrug
+from django.db.models import Q
+from django.http import JsonResponse
 
 
 class PatientViewSet(viewsets.ModelViewSet):
@@ -41,9 +43,22 @@ class DiagnosisViewSet(viewsets.ModelViewSet):
     serializer_class = DiagnosisSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            return Diagnosis.objects.all()
+        return Diagnosis.objects.filter(doctor=self.request.user)
+
+    def perform_create(self, serializer):
+        # Set the doctor's details from the request user
+        user = self.request.user
+        serializer.save(
+            doctor_name=user.get_full_name(),
+            doctor_phone=user.phone_number,
+            doctor_email=user.email,
+        )
+
     @api_view(["GET"])
     def select_drugs(self, request, pk):
-        # diagnosis = self.get_object()
         recommend_drugs_view = RecommendTradDrugsView()
         disease_indications = int(pk)
         response = recommend_drugs_view.get(id=disease_indications)
@@ -54,74 +69,14 @@ class DiagnosisViewSet(viewsets.ModelViewSet):
 class TradDrugAPIView(APIView):
     def get_object(self, pk):
         try:
-            return TradDrug.objects.get(disease_indications=pk)
+            return TradDrug.objects.filter(disease_indications__icontains=pk)
         except TradDrug.DoesNotExist:
             raise NotFound(detail="Traditional drug not found")
 
     def get(self, request, pk, *args, **kwargs):
-        trad_drug = self.get_object(pk)
-        serializer = TradDrugSerializer(trad_drug)
+        trad_drugs = self.get_object(pk)
+        serializer = TradDrugSerializer(trad_drugs, many=True)
         return Response(serializer.data)
-
-    def put(self, request, pk, *args, **kwargs):
-        trad_drug = self.get_object(pk)
-        serializer = TradDrugSerializer(trad_drug, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, *args, **kwargs):
-        trad_drug = self.get_object(pk)
-        trad_drug.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class RecommendTradDrugsView(APIView):
-    # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated]
-    serializer_class = TradDrugSerializer
-
-    def get(self, disease_indications):
-        # disease_indications = request.query_params.get("disease_indications", None)
-        if disease_indications is None:
-            return Response(
-                {"error": "disease_indications parameter is required"}, status=400
-            )
-
-        filtered_drugs = TradDrug.objects.filter(
-            traditional_drugs_ids=disease_indications
-        )
-        if not filtered_drugs.exists():
-            raise ValidationError("No drugs found with the given disease indications")
-
-        serializer = TradDrugSerializer(filtered_drugs, many=True)
-        return Response(serializer.data)
-
-
-# views.py
-
-
-# class RecommendTradDrugView(APIView):
-#     permission_classes = [IsAuthenticated]
-#     serializer_class = TradDrugSerializer
-
-#     def get(self, request, *args, **kwargs):
-#         disease_indications = request.query_params.get("disease_indications", None)
-#         if disease_indications is None:
-#             return Response(
-#                 {"error": "disease_indications parameter is required"}, status=400
-#             )
-
-#         # Use icontains to perform a case-insensitive search within the disease_indications field
-#         filtered_drugs = TradDrug.objects.filter(
-#             disease_indications__icontains=disease_indications
-#         )
-#         if not filtered_drugs.exists():
-#             raise ValidationError("No drugs found with the given disease indications")
-
-#         serializer = TradDrugSerializer(filtered_drugs, many=True)
-#         return Response(serializer.data)
 
 
 class ReportViewSet(viewsets.ReadOnlyModelViewSet):
