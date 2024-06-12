@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "recommendations.apps.RecommendationsConfig",
     "histories.apps.HistoriesConfig",
     "drugInfo.apps.DrugInfoConfig",
+    "users.apps.UsersConfig",
     # 3rd-party apps
     "django_extensions",
     "rest_framework",
@@ -105,7 +106,7 @@ WSGI_APPLICATION = "django_project.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "cdss_fyp",
+        "NAME": "fyp_cdss",
         "USER": "postgres",
         "PASSWORD": "1234",
         "HOST": "localhost",
@@ -171,8 +172,8 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        # "rest_framework_simplejwt.authentication.JWTAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        # "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
@@ -198,3 +199,6 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     # OTHER SETTINGS
 }
+
+ACCOUNT_EMAIL_VERIFICATION = "none"
+AUTHENTICATION_BACKENDS = ["django_project.backends.UserIDBackend"]

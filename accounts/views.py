@@ -8,6 +8,7 @@ from dj_rest_auth.views import LoginView as BaseLoginView
 from dj_rest_auth.registration.views import RegisterView as BaseRegisterView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.core.mail import send_mail
 
 # Create your views here.
 
@@ -29,16 +30,26 @@ class LoginView(BaseLoginView):
 
 
 class RegisterView(BaseRegisterView):
-    authentication_classes = [JWTAuthentication]
+    # authentication_classes = [JWTAuthentication]
     permission_classes = [AllowAny]
 
-    def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
+
+def create(self, request, *args, **kwargs):
+    serializer = self.get_serializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.save()
+        email = user.email
+        send_mail(
+            "Welcome to Our Site",
+            f"Your user ID is {user.id}",
+            "from@example.com",
+            [email],
+            fail_silently=False,
+        )
+        response = Response(serializer.data, status=status.HTTP_201_CREATED)
         response.data["message"] = "Registration successful!"
-        # Remove the token created by dj-rest-auth automatically from the response
-        if "key" in response.data:
-            del response.data["key"]
         return response
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserViewSet(viewsets.ModelViewSet):

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Patient, Diagnosis, TradDrug
+from .models import Patient, Diagnosis, TraditionalDrug
 
 
 class PatientSerializer(serializers.ModelSerializer):
@@ -41,9 +41,9 @@ class DiagnosisSerializer(serializers.ModelSerializer):
         return instance.created_at.strftime("%B %d, %Y, %H:%M")
 
 
-class TradDrugSerializer(serializers.ModelSerializer):
+class TraditionalDrugSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TradDrug
+        model = TraditionalDrug
         fields = [
             "id",
             "product_name",

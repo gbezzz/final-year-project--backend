@@ -13,18 +13,6 @@ import random
 # Create your models here.
 
 
-class TradDrug(models.Model):
-
-    id = models.AutoField(primary_key=True)
-    product_name = models.CharField(max_length=100)
-    disease_indications = models.CharField(max_length=100)
-    adverse_effects = models.CharField(max_length=100)
-    active_ingredient = models.CharField(max_length=200)
-
-    def __str__(self):
-        return self.name
-
-
 class Patient(models.Model):
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
@@ -130,3 +118,15 @@ class Diagnosis(models.Model):
 #             doctor_phone=instance.doctor_phone,
 #             created_at=instance.created_at,
 #         )
+
+
+class TraditionalDrug(models.Model):
+
+    id = models.AutoField(primary_key=True)
+    product_name = models.CharField(max_length=100)
+    disease_indications = models.CharField(max_length=100)
+    adverse_effects = models.CharField(max_length=100)
+    active_ingredient = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.product_name

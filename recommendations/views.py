@@ -5,7 +5,7 @@ from .serializers import (
     PatientSerializer,
     DiagnosisSerializer,
     ReportSerializer,
-    TradDrugSerializer,
+    TraditionalDrugSerializer,
 )
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -18,7 +18,7 @@ from rest_framework.decorators import (
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, ValidationError
-from .models import TradDrug
+from .models import TraditionalDrug
 from django.db.models import Q
 from django.http import JsonResponse
 
@@ -75,7 +75,7 @@ class TradDrugAPIView(APIView):
 
     def get(self, request, pk, *args, **kwargs):
         trad_drugs = self.get_object(pk)
-        serializer = TradDrugSerializer(trad_drugs, many=True)
+        serializer = TraditionalDrugSerializer(trad_drugs, many=True)
         return Response(serializer.data)
 
 
