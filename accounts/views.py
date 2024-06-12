@@ -9,13 +9,35 @@ from dj_rest_auth.registration.views import RegisterView as BaseRegisterView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.core.mail import send_mail
+import random
+import string
+
 
 # Create your views here.
+UserModel = get_user_model()
 
 
 class LoginView(BaseLoginView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = authenticate(
+            request,
+            user_id=serializer.validated_data["user_id"],
+            password=serializer.validated_data["password"],
+        )
+        if user is not None:
+            # login successful
+            return Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+        else:
+            # login failed
+            return Response(
+                {"message": "Invalid user_id or password"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
 
     def get_response(self):
         original_response = super().get_response()
@@ -33,23 +55,24 @@ class RegisterView(BaseRegisterView):
     # authentication_classes = [JWTAuthentication]
     permission_classes = [AllowAny]
 
-
-def create(self, request, *args, **kwargs):
-    serializer = self.get_serializer(data=request.data)
-    if serializer.is_valid():
-        user = serializer.save()
-        email = user.email
-        send_mail(
-            "Welcome to Our Site",
-            f"Your user ID is {user.id}",
-            "from@example.com",
-            [email],
-            fail_silently=False,
-        )
-        response = Response(serializer.data, status=status.HTTP_201_CREATED)
-        response.data["message"] = "Registration successful!"
-        return response
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            user_id = "".join(
+                random.choices(string.ascii_uppercase + string.digits, k=8)
+            )  # generate a unique user_id
+            user = serializer.save(user_id=user_id)
+            send_mail(
+                "Welcome",
+                "Hello {}, your user id is {}".format(user.first_name, user.user_id),
+                "from@example.com",
+                [user.email],
+                fail_silently=False,
+            )
+            response = Response(serializer.data, status=status.HTTP_201_CREATED)
+            response.data["message"] = "Registration successful!"
+            return response
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserViewSet(viewsets.ModelViewSet):

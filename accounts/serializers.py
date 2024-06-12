@@ -5,6 +5,7 @@ from dj_rest_auth.registration.serializers import RegisterSerializer
 
 
 class LoginSerializer(serializers.Serializer):
+    user_id = serializers.CharField()
     username = serializers.CharField(required=False, allow_blank=True)
     email = serializers.EmailField(required=False, allow_blank=True)
     password = serializers.CharField(style={"input_type": "password"})
@@ -21,11 +22,11 @@ class LoginSerializer(serializers.Serializer):
 
         return user
 
-    def _validate_username(self, username, password):
-        if username and password:
-            user = self.authenticate(username=username, password=password)
+    def _validate_user_id(self, user_id, password):
+        if user_id and password:
+            user = self.authenticate(user_id=user_id, password=password)
         else:
-            msg = _('Must include "username" and "password".')
+            msg = _('Must include "user id" and "password".')
             raise exceptions.ValidationError(msg)
 
         return user
@@ -47,7 +48,6 @@ class UserSerializer(serializers.ModelSerializer):
         model = get_user_model()
         fields = (
             "id",
-            "username",
             "first_name",
             "last_name",
             "phone_number",
