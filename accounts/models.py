@@ -9,7 +9,7 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    user_id = models.CharField(max_length=8, unique=True)
+    user_id = models.CharField(max_length=8)
     phone_number = models.CharField(max_length=15, default=" ")
 
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
