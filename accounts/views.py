@@ -42,53 +42,8 @@ class LoginView(BaseLoginView):
         return original_response
 
 
-# class RegisterView(generics.CreateAPIView):
-#     serializer_class = CustomRegisterSerializer
-#     permission_classes = [AllowAny]
-
-
-# def perform_create(self, serializer):
-#     user = serializer.save(request=self.request)
-#     while True:
-#         username = "".join(
-#             random.choices(string.ascii_uppercase + string.digits, k=8)
-#         )  # generate a unique user_id
-#         if not CustomUser.objects.filter(username=username).exists():
-#             user.username = username
-#             try:
-#                 user.save()
-#                 break
-#             except IntegrityError:
-#                 continue
-#     send_mail(
-#         "Welcome",
-#         "Hello {}, your user id is {}".format(user.first_name, user.username),
-#         "from@example.com",
-#         [user.email],
-#         fail_silently=False,
-#     )
 class RegisterView(BaseRegisterView):
     def perform_create(self, serializer):
-        # user = serializer.save(request=self.request)
-        # while True:
-        #     username = "".join(
-        #         random.choices(string.ascii_uppercase + string.digits, k=8)
-        #     )  # generate a unique user_id
-        #     if not CustomUser.objects.filter(username=username).exists():
-        #         user.username = username
-        #         try:
-        #             user.save()
-        #             break
-        #         except IntegrityError:
-        #             continue
-        # send_mail(
-        #     "Welcome",
-        #     "Hello {}, your user id is {}".format(user.first_name, user.username),
-        #     "from@example.com",
-        #     [user.email],
-        #     fail_silently=False,
-        # )
-
         user = serializer.save(self.request)
         username = "".join(random.choices(string.ascii_uppercase + string.digits, k=8))
         user.username = username
@@ -96,21 +51,10 @@ class RegisterView(BaseRegisterView):
             user.save()
         except IntegrityError:
             pass
-        # if (
-        #     allauth_settings.EMAIL_VERIFICATION
-        #     != allauth_settings.EmailVerificationMethod.MANDATORY
-        # ):
         if getattr(settings, "REST_USE_JWT", False):
             self.access_token, self.refresh_token = jwt_encode(user)
         else:
             create_token(self.token_model, user, serializer)
-
-        # complete_signup(
-        #     self.request._request,
-        #     user,
-        #     allauth_settings.EMAIL_VERIFICATION,
-        #     None,
-        # )
         return user
 
     def create(self, request, *args, **kwargs):
