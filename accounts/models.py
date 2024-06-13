@@ -5,19 +5,12 @@ from django.contrib.auth.models import AbstractUser
 
 
 class CustomUser(AbstractUser):
+    username = models.CharField(max_length=150, unique=True, null=True)
+    email = models.EmailField(unique=True)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    user_id = models.CharField(max_length=8)
+    phone_number = models.CharField(max_length=15, default=" ")
 
-    CHOICES = (
-        ("admin", "Admin"),
-        ("doctor", "Doctor"),
-    )
-    role = models.CharField(max_length=10, choices=CHOICES, null=True)
-    phone_number = models.CharField(max_length=15, default="No phone number provided")
-    GENDER_CHOICES = (
-        ("M", "Male"),
-        ("F", "Female"),
-    )
-    gender = models.CharField(
-        max_length=1, choices=GENDER_CHOICES, default="Gender not specified"
-    )
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)

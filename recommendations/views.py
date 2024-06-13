@@ -1,15 +1,31 @@
-from django.shortcuts import render
-from rest_framework import viewsets, filters
-from .models import Patient, Diagnose
-from .serializers import PatientSerializer, DiagnoseSerializer, ReportSerializer
+from django.shortcuts import render, get_object_or_404
+from rest_framework import viewsets, filters, serializers
+from .models import Patient, Diagnosis
+from .serializers import (
+    PatientSerializer,
+    DiagnosisSerializer,
+    ReportSerializer,
+    TraditionalDrugSerializer,
+)
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
-
-# Create your views here.
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+    action,
+)
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.exceptions import NotFound, ValidationError
+from .models import TraditionalDrug
+from django.db.models import Q
+from django.http import JsonResponse
 
 
 class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
+    # authentication_classes = [JWTAuthentication]
     serializer_class = PatientSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.SearchFilter]
@@ -21,16 +37,16 @@ class PatientViewSet(viewsets.ModelViewSet):
     ]
 
 
-class DiagnoseViewSet(viewsets.ModelViewSet):
-    queryset = Diagnose.objects.all()
+class DiagnosisViewSet(viewsets.ModelViewSet):
+    queryset = Diagnosis.objects.all()
+    # authentication_classes = [JWTAuthentication]
+    serializer_class = DiagnosisSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         if self.request.user.is_superuser:
-            return Diagnose.objects.all()
-        return Diagnose.objects.filter(doctor=self.request.user)
-
-    serializer_class = DiagnoseSerializer
-    permission_classes = [IsAuthenticated]
+            return Diagnosis.objects.all()
+        return Diagnosis.objects.filter(doctor=self.request.user)
 
     def perform_create(self, serializer):
         # Set the doctor's details from the request user
@@ -41,18 +57,33 @@ class DiagnoseViewSet(viewsets.ModelViewSet):
             doctor_email=user.email,
         )
 
+    @api_view(["GET"])
+    def select_drugs(self, request, pk):
+        recommend_drugs_view = RecommendTradDrugsView()
+        disease_indications = int(pk)
+        response = recommend_drugs_view.get(id=disease_indications)
+
+        return Response(response.data)
+
+
+class TradDrugAPIView(APIView):
+    def get_object(self, pk):
+        try:
+            return TradDrug.objects.filter(disease_indications__icontains=pk)
+        except TradDrug.DoesNotExist:
+            raise NotFound(detail="Traditional drug not found")
+
+    def get(self, request, pk, *args, **kwargs):
+        trad_drugs = self.get_object(pk)
+        serializer = TraditionalDrugSerializer(trad_drugs, many=True)
+        return Response(serializer.data)
+
 
 class ReportViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Diagnose.objects.all()
-
-    def get_queryset(self):
-
-        if self.request.user.is_superuser:
-            return Diagnose.objects.all()
-        return Diagnose.objects.filter(doctor=self.request.user)
-
-    serializer_class = ReportSerializer
+    queryset = Diagnosis.objects.all()
+    # authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    serializer_class = ReportSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = [
         "patient__last_name",
@@ -63,3 +94,38 @@ class ReportViewSet(viewsets.ReadOnlyModelViewSet):
         "diagnosis_made",
         "doctor_name",
     ]
+
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            return Diagnosis.objects.all()
+        return Diagnosis.objects.filter(doctor=self.request.user)
+
+    @action(detail=True, methods=["post"])
+    def add_drugs(self, request, pk=None):
+        # orthodox_drug_ids = request.data.get("orthodox_drug_ids", "").split(",")
+        traditional_drug_ids = request.data.get("traditional_drug_ids", "").split(",")
+
+        # Validate that the provided drug IDs exist in the database
+        # if not all(
+        #      OrthodoxDrug.objects.filter(id=id).exists() for id in orthodox_drug_ids
+        # ):
+        #     raise ValidationError("One or more orthodox drug IDs do not exist.")
+        if not all(
+            TraditionalDrug.objects.filter(id=id).exists()
+            for id in traditional_drug_ids
+        ):
+            raise ValidationError("One or more traditional drug IDs do not exist.")
+
+        report = self.get_object()
+        # report.orthodox_drug_ids = ",".join(orthodox_drug_ids)
+        report.traditional_drug_ids = ",".join(traditional_drug_ids)
+
+        # Get the names of the selected orthodox and traditional drugs
+        # orthodox_drugs = OrthodoxDrug.objects.filter(id__in=orthodox_drug_ids)
+        trad_drugs = TradDrug.objects.filter(id__in=traditional_drug_ids)
+        selected_drugs = """[drug.product_name for drug in trad_drugs] ="""
+        [drug.product_name for drug in trad_drugs]
+        report.selected_drug = ", ".join(selected_drugs)
+        report.save()
+
+        return Response(self.get_serializer(report).data)

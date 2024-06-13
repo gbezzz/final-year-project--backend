@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
+from dotenv import load_dotenv
+import os
+
+load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,12 +30,13 @@ SECRET_KEY = "django-insecure-=z3z)t5e1acvz_451sw0g&2*ls^0vc6qr(9pdtdvx+50-uqc$d
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    # "socialaccount",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -42,6 +48,7 @@ INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",
     "recommendations.apps.RecommendationsConfig",
     "histories.apps.HistoriesConfig",
+    "drugInfo.apps.DrugInfoConfig",
     # 3rd-party apps
     "django_extensions",
     "rest_framework",
@@ -50,7 +57,7 @@ INSTALLED_APPS = [
     "dj_rest_auth",
     "allauth",
     "allauth.account",
-    "allauth.socialaccount",
+    # "allauth.socialaccount",
     "dj_rest_auth.registration",
     "drf_spectacular",
 ]
@@ -100,6 +107,22 @@ DATABASES = {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     }
+    # "default": {
+    #     "ENGINE": "django.db.backends.postgresql",
+    #     "NAME": "fyp_cdss",
+    #     "USER": "postgres",
+    #     "PASSWORD": "1234",
+    #     "HOST": "localhost",
+    #     "PORT": "5432",
+    # },
+    # "mongodb": {
+    #     "ENGINE": "djongo",
+    #     "NAME": "sample_medicines",
+    #     "ENFORCE_SCHEMA": False,
+    #     "CLIENT": {
+    #         "host": "mongodb://mongo:vHaTKDCiGQcxxmQitkviXTNKvGeMGnIT@viaduct.proxy.rlwy.net:59093/"
+    #     },
+    # },
 }
 
 
@@ -121,6 +144,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# DATABASE_ROUTERS = ["drugInfo.dbrouters.MyDBRouter"]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -151,7 +175,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        # "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
@@ -171,9 +195,14 @@ REST_AUTH_REGISTER_SERIALIZERS = {
     "REGISTER_SERIALIZER": "accounts.serializers.CustomRegisterSerializer",
 }
 
+
 SPECTACULAR_SETTINGS = {
     "TITLE": " CDSS API",
     "DESCRIPTION": "Endpoints for the Orthodox & Traditional Drug CDSS API",
     "VERSION": "1.0.0",
     # OTHER SETTINGS
 }
+
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_AUTHENTICATION_METHOD = 'user_id'
+# AUTHENTICATION_BACKENDS = ['django_project.backends.UserIDBackend']

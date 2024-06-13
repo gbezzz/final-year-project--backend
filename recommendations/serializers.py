@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Patient, Diagnose
+from .models import Patient, Diagnosis, TraditionalDrug
 
 
 class PatientSerializer(serializers.ModelSerializer):
@@ -27,9 +27,9 @@ class PatientSerializer(serializers.ModelSerializer):
         return f"{age['years']} years, {age['months']} months, and {age['days']} days"
 
 
-class DiagnoseSerializer(serializers.ModelSerializer):
+class DiagnosisSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Diagnose
+        model = Diagnosis
         fields = [
             "patient",
             "doctor",
@@ -39,6 +39,18 @@ class DiagnoseSerializer(serializers.ModelSerializer):
 
     def get_created_at(self, instance):
         return instance.created_at.strftime("%B %d, %Y, %H:%M")
+
+
+class TraditionalDrugSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TraditionalDrug
+        fields = [
+            "id",
+            "product_name",
+            "disease_indications",
+            "adverse_effects",
+            "active_ingredient",
+        ]
 
 
 class ReportSerializer(serializers.ModelSerializer):
@@ -56,7 +68,7 @@ class ReportSerializer(serializers.ModelSerializer):
     created_at = serializers.SerializerMethodField()
 
     class Meta:
-        model = Diagnose
+        model = Diagnosis
         fields = [
             "patient_id",
             "patient_last_name",
@@ -66,8 +78,9 @@ class ReportSerializer(serializers.ModelSerializer):
             "patient_phone_number",
             "patient_email",
             "patient_address",
-            "diagnosis_id",
+            "diagnosis_identifier",
             "diagnosis_made",
+            "selected_drug",
             "doctor_name",
             "doctor_phone",
             "doctor_email",

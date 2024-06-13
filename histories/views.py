@@ -11,6 +11,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 class HistoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = History.objects.all()
     serializer_class = HistorySerializer
+    # authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.SearchFilter]
     search_fields = [
