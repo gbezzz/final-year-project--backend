@@ -57,7 +57,7 @@ INSTALLED_APPS = [
     "dj_rest_auth",
     "allauth",
     "allauth.account",
-    # "allauth.socialaccount",
+    "allauth.socialaccount",
     "dj_rest_auth.registration",
     "drf_spectacular",
 ]
@@ -103,26 +103,26 @@ WSGI_APPLICATION = "django_project.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
     # "default": {
-    #     "ENGINE": "django.db.backends.postgresql",
-    #     "NAME": "fyp_cdss",
-    #     "USER": "postgres",
-    #     "PASSWORD": "1234",
-    #     "HOST": "localhost",
-    #     "PORT": "5432",
-    # },
-    # "mongodb": {
-    #     "ENGINE": "djongo",
-    #     "NAME": "sample_medicines",
-    #     "ENFORCE_SCHEMA": False,
-    #     "CLIENT": {
-    #         "host": "mongodb://mongo:vHaTKDCiGQcxxmQitkviXTNKvGeMGnIT@viaduct.proxy.rlwy.net:59093/"
-    #     },
-    # },
+    #     "ENGINE": "django.db.backends.sqlite3",
+    #     "NAME": BASE_DIR / "db.sqlite3",
+    # }
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "cdss",
+        "USER": "postgres",
+        "PASSWORD": "1234",
+        "HOST": "localhost",
+        "PORT": "5432",
+    },
+    "mongodb": {
+        "ENGINE": "djongo",
+        "NAME": "sample_medicines",
+        "ENFORCE_SCHEMA": False,
+        "CLIENT": {
+            "host": "mongodb://mongo:vHaTKDCiGQcxxmQitkviXTNKvGeMGnIT@viaduct.proxy.rlwy.net:59093/"
+        },
+    },
 }
 
 
@@ -204,5 +204,5 @@ SPECTACULAR_SETTINGS = {
 }
 
 ACCOUNT_EMAIL_VERIFICATION = "none"
-ACCOUNT_AUTHENTICATION_METHOD = 'user_id'
+
 # AUTHENTICATION_BACKENDS = ['django_project.backends.UserIDBackend']
