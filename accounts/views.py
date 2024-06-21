@@ -51,10 +51,10 @@ class RegisterView(BaseRegisterView):
             user.save()
         except IntegrityError:
             pass
-        if getattr(settings, "REST_USE_JWT", False):
-            self.access_token, self.refresh_token = jwt_encode(user)
-        else:
-            create_token(self.token_model, user, serializer)
+        # if getattr(settings, "REST_USE_JWT", False):
+        #     self.access_token, self.refresh_token = jwt_encode(user)
+        # else:
+        create_token(self.token_model, user, serializer)
         return user
 
     def create(self, request, *args, **kwargs):
@@ -68,7 +68,7 @@ class RegisterView(BaseRegisterView):
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = get_user_model().objects.all()
-    authentication_classes = [JWTAuthentication]
+    # authentication_classes = [JWTAuthentication]
     serializer_class = UserSerializer
     permission_classes = [IsAdminUser]
     filter_backends = [filters.SearchFilter]
@@ -81,7 +81,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class UserDetail(generics.RetrieveDestroyAPIView):
     queryset = get_user_model().objects.all()
-    authentication_classes = [JWTAuthentication]
+    # authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializer
 

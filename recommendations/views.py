@@ -59,7 +59,7 @@ class DiagnosisViewSet(viewsets.ModelViewSet):
 
     @api_view(["GET"])
     def select_drugs(self, request, pk):
-        recommend_drugs_view = RecommendTradDrugsView()
+        recommend_drugs_view = TradDrugAPIView()
         disease_indications = int(pk)
         response = recommend_drugs_view.get(id=disease_indications)
 
@@ -69,8 +69,8 @@ class DiagnosisViewSet(viewsets.ModelViewSet):
 class TradDrugAPIView(APIView):
     def get_object(self, pk):
         try:
-            return TradDrug.objects.filter(disease_indications__icontains=pk)
-        except TradDrug.DoesNotExist:
+            return TraditionalDrug.objects.filter(disease_indications__icontains=pk)
+        except TraditionalDrug.DoesNotExist:
             raise NotFound(detail="Traditional drug not found")
 
     def get(self, request, pk, *args, **kwargs):
@@ -122,7 +122,7 @@ class ReportViewSet(viewsets.ReadOnlyModelViewSet):
 
         # Get the names of the selected orthodox and traditional drugs
         # orthodox_drugs = OrthodoxDrug.objects.filter(id__in=orthodox_drug_ids)
-        trad_drugs = TradDrug.objects.filter(id__in=traditional_drug_ids)
+        trad_drugs = TraditionalDrug.objects.filter(id__in=traditional_drug_ids)
         selected_drugs = """[drug.product_name for drug in trad_drugs] ="""
         [drug.product_name for drug in trad_drugs]
         report.selected_drug = ", ".join(selected_drugs)

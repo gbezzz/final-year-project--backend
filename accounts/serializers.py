@@ -14,7 +14,7 @@ from allauth.account import app_settings as allauth_settings
 
 
 class UserSerializer(serializers.ModelSerializer):
-    user_id = serializers.CharField(
+    username = serializers.CharField(
         max_length=8,
         required=True,
         allow_blank=False,
@@ -24,57 +24,12 @@ class UserSerializer(serializers.ModelSerializer):
         model = get_user_model()
         fields = (
             "id",
-            "user_id",
+            "username",
             "first_name",
             "last_name",
             "phone_number",
         )
 
-
-# class CustomRegisterSerializer(serializers.Serializer):
-#     email = serializers.EmailField(required=allauth_settings.EMAIL_REQUIRED)
-#     first_name = serializers.CharField(max_length=30, required=True)
-#     last_name = serializers.CharField(max_length=30, required=True)
-#     phone_number = serializers.CharField(max_length=15, required=True)
-#     password = serializers.CharField(write_only=True)
-#     username = serializers.CharField(read_only=True)  # Add this line
-
-#     def validate_email(self, email):
-#         email = get_adapter().clean_email(email)
-#         if allauth_settings.UNIQUE_EMAIL:
-#             if email and email_address_exists(email):
-#                 raise serializers.ValidationError(
-#                     _("A user is already registered with this e-mail address."),
-#                 )
-#         return email
-
-#     def validate_password(self, password):
-#         return get_adapter().clean_password(password)
-
-#     def get_cleaned_data(self):
-#         return {
-#             "first_name": self.validated_data.get("first_name", ""),
-#             "last_name": self.validated_data.get("last_name", ""),
-#             "phone_number": self.validated_data.get("phone_number", ""),
-#             "password": self.validated_data.get("password", ""),
-#             "email": self.validated_data.get("email", ""),
-#             "username": self.validated_data.get("username", ""),  # And this line
-#         }
-
-#     def save(self, request):
-#         adapter = get_adapter()
-#         user = adapter.new_user(request)
-#         self.cleaned_data = self.get_cleaned_data()
-#         user = adapter.save_user(request, user, self, commit=False)
-#         try:
-#             adapter.clean_password(self.cleaned_data["password"], user=user)
-#         except DjangoValidationError as exc:
-#             raise serializers.ValidationError(
-#                 detail=serializers.as_serializer_error(exc)
-#             )
-#         user.save()
-#         setup_user_email(request, user, [])
-#         return user
 
 
 class CustomLoginSerializer(serializers.Serializer):
