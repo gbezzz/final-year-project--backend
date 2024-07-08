@@ -81,7 +81,7 @@ class ReportSerializer(serializers.ModelSerializer):
             "patient_phone_number",
             "patient_email",
             "patient_address",
-            "diagnosis_identifier",
+            # "diagnosis_identifier",
             "diagnosis_made",
             "selected_drug",
             "doctor_name",

@@ -25,7 +25,7 @@ from django.http import JsonResponse
 
 class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
-    # authentication_classes = [JWTAuthentication]
+    authentication_classes = [JWTAuthentication]
     serializer_class = PatientSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.SearchFilter]
@@ -39,7 +39,7 @@ class PatientViewSet(viewsets.ModelViewSet):
 
 class DiagnosisViewSet(viewsets.ModelViewSet):
     queryset = Diagnosis.objects.all()
-    # authentication_classes = [JWTAuthentication]
+    authentication_classes = [JWTAuthentication]
     serializer_class = DiagnosisSerializer
     permission_classes = [IsAuthenticated]
 
@@ -79,9 +79,9 @@ class TradDrugAPIView(APIView):
         return Response(serializer.data)
 
 
-class ReportViewSet(viewsets.ReadOnlyModelViewSet):
+class ReportViewSet(viewsets.ModelViewSet):
     queryset = Diagnosis.objects.all()
-    # authentication_classes = [JWTAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = ReportSerializer
     filter_backends = [filters.SearchFilter]
@@ -100,32 +100,28 @@ class ReportViewSet(viewsets.ReadOnlyModelViewSet):
             return Diagnosis.objects.all()
         return Diagnosis.objects.filter(doctor=self.request.user)
 
-    @action(detail=True, methods=["post"])
-    def add_drugs(self, request, pk=None):
-        # orthodox_drug_ids = request.data.get("orthodox_drug_ids", "").split(",")
-        traditional_drug_ids = request.data.get("traditional_drug_ids", "").split(",")
+    # @action(detail=True, methods=["post"])
+    # def add_drugs(self, request, pk=None):
+      
+    #     traditional_drug_ids = request.data.get("traditional_drug_ids", "").split(",")
 
-        # Validate that the provided drug IDs exist in the database
-        # if not all(
-        #      OrthodoxDrug.objects.filter(id=id).exists() for id in orthodox_drug_ids
-        # ):
-        #     raise ValidationError("One or more orthodox drug IDs do not exist.")
-        if not all(
-            TraditionalDrug.objects.filter(id=id).exists()
-            for id in traditional_drug_ids
-        ):
-            raise ValidationError("One or more traditional drug IDs do not exist.")
+ 
+    #     if not all(
+    #         TraditionalDrug.objects.filter(id=id).exists()
+    #         for id in traditional_drug_ids
+    #     ):
+    #         raise ValidationError("One or more traditional drug IDs do not exist.")
 
-        report = self.get_object()
-        # report.orthodox_drug_ids = ",".join(orthodox_drug_ids)
-        report.traditional_drug_ids = ",".join(traditional_drug_ids)
+    #     report = self.get_object()
 
-        # Get the names of the selected orthodox and traditional drugs
-        # orthodox_drugs = OrthodoxDrug.objects.filter(id__in=orthodox_drug_ids)
-        trad_drugs = TraditionalDrug.objects.filter(id__in=traditional_drug_ids)
-        selected_drugs = """[drug.product_name for drug in trad_drugs] ="""
-        [drug.product_name for drug in trad_drugs]
-        report.selected_drug = ", ".join(selected_drugs)
-        report.save()
+    #     report.traditional_drug_ids = ",".join(traditional_drug_ids)
 
-        return Response(self.get_serializer(report).data)
+    #     # Get the names of the selected traditional drugs
+
+    #     trad_drugs = TraditionalDrug.objects.filter(id__in=traditional_drug_ids)
+    #     selected_drugs = """[drug.product_name for drug in trad_drugs] ="""
+    #     [drug.product_name for drug in trad_drugs]
+    #     report.selected_drug = ", ".join(selected_drugs)
+    #     report.save()
+
+        # return Response(self.get_serializer(report).data)
