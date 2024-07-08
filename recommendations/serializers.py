@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Patient, Diagnosis, TraditionalDrug
+from .models import Patient, Diagnosis, Report, TraditionalDrug
 
 
 class PatientSerializer(serializers.ModelSerializer):
@@ -62,16 +62,18 @@ class ReportSerializer(serializers.ModelSerializer):
     patient_phone_number = serializers.CharField(source="patient.phone_number")
     patient_email = serializers.EmailField(source="patient.email")
     patient_address = serializers.CharField(source="patient.address")
-    # diagnosis_identifier =
-    # diagnosis_made =
-    # selected_drug =
+    diagnosis_identifier = serializers.CharField(
+        source="diagnosis.diagnosis_identifier"
+    )
+    diagnosis_made = serializers.CharField(source="diagnosis.diagnosis_made")
+    selected_drug = serializers.CharField(source="diagnosis.selected_drug")
     doctor_name = serializers.CharField(source="doctor.get_full_name", read_only=True)
     doctor_phone = serializers.CharField(source="doctor.phone_number", read_only=True)
     doctor_email = serializers.EmailField(source="doctor.email", read_only=True)
     created_at = serializers.SerializerMethodField()
 
     class Meta:
-        model = Diagnosis
+        model = Report
         fields = [
             "patient_id",
             "patient_last_name",

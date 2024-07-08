@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
-from rest_framework import viewsets, filters, serializers
-from .models import Patient, Diagnosis
+from rest_framework import viewsets, filters, serializers, status
+from .models import Patient, Diagnosis, Report
 from .serializers import (
     PatientSerializer,
     DiagnosisSerializer,
@@ -80,7 +80,7 @@ class TradDrugAPIView(APIView):
 
 
 class ReportViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Diagnosis.objects.all()
+    queryset = Report.objects.all()
     # authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = ReportSerializer
@@ -97,35 +97,31 @@ class ReportViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         if self.request.user.is_superuser:
-            return Diagnosis.objects.all()
-        return Diagnosis.objects.filter(doctor=self.request.user)
+            return Report.objects.all()
+        return Report.objects.filter(doctor=self.request.user)
 
-    @action(detail=True, methods=["post"])
-    def add_drugs(self, request, pk=None):
-        # orthodox_drug_ids = request.data.get("orthodox_drug_ids", "").split(",")
-        traditional_drug_ids = request.data.get("traditional_drug_ids", "").split(",")
+    def create(self, request, *args, **kwargs):
+        # Assuming request data contains patient and diagnosis information
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        # Validate that the provided drug IDs exist in the database
-        # if not all(
-        #      OrthodoxDrug.objects.filter(id=id).exists() for id in orthodox_drug_ids
-        # ):
-        #     raise ValidationError("One or more orthodox drug IDs do not exist.")
-        if not all(
-            TraditionalDrug.objects.filter(id=id).exists()
-            for id in traditional_drug_ids
-        ):
-            raise ValidationError("One or more traditional drug IDs do not exist.")
+        # Extract patient and diagnosis data from request
+        patient_data = serializer.validated_data.get("patient")
+        diagnosis_data = serializer.validated_data.get("diagnosis")
 
-        report = self.get_object()
-        # report.orthodox_drug_ids = ",".join(orthodox_drug_ids)
-        report.traditional_drug_ids = ",".join(traditional_drug_ids)
+        # Create Patient and Diagnosis instances
+        patient, created_patient = Patient.objects.get_or_create(**patient_data)
+        diagnosis = Diagnosis.objects.create(
+            patient=patient, doctor=request.user, **diagnosis_data
+        )
 
-        # Get the names of the selected orthodox and traditional drugs
-        # orthodox_drugs = OrthodoxDrug.objects.filter(id__in=orthodox_drug_ids)
-        trad_drugs = TraditionalDrug.objects.filter(id__in=traditional_drug_ids)
-        selected_drugs = """[drug.product_name for drug in trad_drugs] ="""
-        [drug.product_name for drug in trad_drugs]
-        report.selected_drug = ", ".join(selected_drugs)
-        report.save()
+        # Create Report instance linked to Patient and Diagnosis
+        new_report = Report.objects.create(
+            patient=patient,
+            doctor=request.user,
+            diagnosis=diagnosis,
+            selected_drug=diagnosis.selected_drug,  # Assuming selected_drug is in diagnosis_data
+        )
 
-        return Response(self.get_serializer(report).data)
+        serializer = self.get_serializer(new_report)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
