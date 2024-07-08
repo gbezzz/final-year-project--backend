@@ -132,3 +132,14 @@ class TraditionalDrug(models.Model):
     def __str__(self):
         return self.product_name
 
+
+class Report(models.Model):
+
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    doctor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    diagnosis = models.ForeignKey(Diagnosis, on_delete=models.CASCADE)
+    selected_drug = models.ForeignKey(TraditionalDrug, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Report for {self.diagnosis.patient.first_name} {self.diagnosis.patient.last_name} by Dr. {self.diagnosis.doctor_name} on {self.created_at.strftime('%Y-%m-%d')}"

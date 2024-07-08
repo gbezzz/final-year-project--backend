@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
-from rest_framework import viewsets, filters, serializers
-from .models import Patient, Diagnosis
+from rest_framework import viewsets, filters, serializers, status
+from .models import Patient, Diagnosis, Report
 from .serializers import (
     PatientSerializer,
     DiagnosisSerializer,
@@ -97,8 +97,8 @@ class ReportViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.request.user.is_superuser:
-            return Diagnosis.objects.all()
-        return Diagnosis.objects.filter(doctor=self.request.user)
+            return Report.objects.all()
+        return Report.objects.filter(doctor=self.request.user)
 
     # @action(detail=True, methods=["post"])
     # def add_drugs(self, request, pk=None):
