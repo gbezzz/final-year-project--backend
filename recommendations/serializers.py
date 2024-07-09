@@ -63,7 +63,7 @@ class ReportSerializer(serializers.ModelSerializer):
     patient_email = serializers.EmailField(source="patient.email")
     patient_address = serializers.CharField(source="patient.address")
     diagnosis_identifier = serializers.CharField(
-        source="diagnosis.diagnosis_identifier"
+        source="diagnosis.diagnosis_identifier", read_only=True
     )
     diagnosis_made = serializers.CharField(source="diagnosis.diagnosis_made")
     selected_drug = serializers.CharField(source="diagnosis.selected_drug")
@@ -75,6 +75,7 @@ class ReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Report
         fields = [
+            "id",
             "patient_id",
             "patient_last_name",
             "patient_first_name",
@@ -83,7 +84,7 @@ class ReportSerializer(serializers.ModelSerializer):
             "patient_phone_number",
             "patient_email",
             "patient_address",
-            # "diagnosis_identifier",
+            "diagnosis_identifier",
             "diagnosis_made",
             "selected_drug",
             "doctor_name",
@@ -91,6 +92,23 @@ class ReportSerializer(serializers.ModelSerializer):
             "doctor_email",
             "created_at",
         ]
+
+    def create(self, validated_data):
+        # Extract nested data
+        patient_data = validated_data.pop('patient', None)
+        diagnosis_data = validated_data.pop('diagnosis', None)
+
+        # Create Diagnosis instance first
+        diagnosis_instance = Diagnosis.objects.create(**diagnosis_data)
+
+        # Now create Report instance
+        report = Report.objects.create(
+            patient=patient_data,
+            diagnosis=diagnosis_instance,
+            **validated_data
+        )
+
+        return report
 
     def get_created_at(self, instance) -> str:
         return instance.created_at.strftime("%B %d, %Y, %H:%M")
