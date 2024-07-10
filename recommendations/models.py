@@ -69,6 +69,7 @@ class Patient(models.Model):
 
 
 class Diagnosis(models.Model):
+    id = models.AutoField(primary_key=True)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     doctor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
 
@@ -133,7 +134,7 @@ class TraditionalDrug(models.Model):
 
 
 class Report(models.Model):
-
+    id = models.AutoField(primary_key=True)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     doctor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     diagnosis = models.ForeignKey(Diagnosis, on_delete=models.CASCADE)

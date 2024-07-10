@@ -37,6 +37,7 @@ class DiagnosisSerializer(serializers.ModelSerializer):
     class Meta:
         model = Diagnosis
         fields = [
+            "id",
             "patient",
             "doctor",
             "diagnosis_identifier",
@@ -61,13 +62,10 @@ class TraditionalDrugSerializer(serializers.ModelSerializer):
 
 
 class ReportSerializer(serializers.ModelSerializer):
-    patient = PatientSerializer(read_only=True)
-    diagnosis = DiagnosisSerializer(read_only=True)
-    doctor = UserSerializer(read_only=True)
+
     selected_drug = serializers.PrimaryKeyRelatedField(
         queryset=TraditionalDrug.objects.all()
     )
-    created_at = serializers.SerializerMethodField()
 
     class Meta:
         model = Report
