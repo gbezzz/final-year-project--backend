@@ -78,7 +78,6 @@ class Diagnosis(models.Model):
 
     diagnosis_identifier = models.CharField(max_length=8, unique=True)
     diagnosis_made = models.TextField()
-    selected_drug = models.CharField(max_length=100)
     doctor_name = models.CharField(max_length=75)
     doctor_phone = models.CharField(max_length=15)
     doctor_email = models.EmailField()

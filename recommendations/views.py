@@ -79,7 +79,7 @@ class TradDrugAPIView(APIView):
         return Response(serializer.data)
 
 
-class ReportViewSet(viewsets.ReadOnlyModelViewSet):
+class ReportViewSet(viewsets.ModelViewSet):
     queryset = Report.objects.all()
     # authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -99,29 +99,3 @@ class ReportViewSet(viewsets.ReadOnlyModelViewSet):
         if self.request.user.is_superuser:
             return Report.objects.all()
         return Report.objects.filter(doctor=self.request.user)
-
-    def create(self, request, *args, **kwargs):
-        # Assuming request data contains patient and diagnosis information
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        # Extract patient and diagnosis data from request
-        patient_data = serializer.validated_data.get("patient")
-        diagnosis_data = serializer.validated_data.get("diagnosis")
-
-        # Create Patient and Diagnosis instances
-        patient, created_patient = Patient.objects.get_or_create(**patient_data)
-        diagnosis = Diagnosis.objects.create(
-            patient=patient, doctor=request.user, **diagnosis_data
-        )
-
-        # Create Report instance linked to Patient and Diagnosis
-        new_report = Report.objects.create(
-            patient=patient,
-            doctor=request.user,
-            diagnosis=diagnosis,
-            selected_drug=diagnosis.selected_drug,  # Assuming selected_drug is in diagnosis_data
-        )
-
-        serializer = self.get_serializer(new_report)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)

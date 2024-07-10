@@ -1,5 +1,9 @@
+from os import read
+from pickle import TRUE
 from rest_framework import serializers
 from .models import Patient, Diagnosis, Report, TraditionalDrug
+from accounts.models import CustomUser
+from accounts.serializers import UserSerializer
 
 
 class PatientSerializer(serializers.ModelSerializer):
@@ -28,11 +32,14 @@ class PatientSerializer(serializers.ModelSerializer):
 
 
 class DiagnosisSerializer(serializers.ModelSerializer):
+    diagnosis_identifier = serializers.CharField(read_only=TRUE)
+
     class Meta:
         model = Diagnosis
         fields = [
             "patient",
             "doctor",
+            "diagnosis_identifier",
             "diagnosis_made",
             "created_at",
         ]
@@ -54,43 +61,24 @@ class TraditionalDrugSerializer(serializers.ModelSerializer):
 
 
 class ReportSerializer(serializers.ModelSerializer):
-    patient_id = serializers.CharField(source="patient.pid")
-    patient_last_name = serializers.CharField(source="patient.last_name")
-    patient_first_name = serializers.CharField(source="patient.first_name")
-    patient_sex = serializers.CharField(source="patient.sex")
-    patient_age = serializers.SerializerMethodField(source="patient.age")
-    patient_phone_number = serializers.CharField(source="patient.phone_number")
-    patient_email = serializers.EmailField(source="patient.email")
-    patient_address = serializers.CharField(source="patient.address")
-    diagnosis_identifier = serializers.CharField(
-        source="diagnosis.diagnosis_identifier"
+    patient = PatientSerializer(read_only=True)
+    diagnosis = DiagnosisSerializer(read_only=True)
+    doctor = UserSerializer(read_only=True)
+    selected_drug = serializers.PrimaryKeyRelatedField(
+        queryset=TraditionalDrug.objects.all()
     )
-    diagnosis_made = serializers.CharField(source="diagnosis.diagnosis_made")
-    selected_drug = serializers.CharField(source="diagnosis.selected_drug")
-    doctor_name = serializers.CharField(source="doctor.get_full_name", read_only=True)
-    doctor_phone = serializers.CharField(source="doctor.phone_number", read_only=True)
-    doctor_email = serializers.EmailField(source="doctor.email", read_only=True)
     created_at = serializers.SerializerMethodField()
 
     class Meta:
         model = Report
-        fields = [
-            "patient_id",
-            "patient_last_name",
-            "patient_first_name",
-            "patient_sex",
-            "patient_age",
-            "patient_phone_number",
-            "patient_email",
-            "patient_address",
-            "diagnosis_identifier",
-            "diagnosis_made",
+        fields = (
+            "id",
+            "patient",
+            "diagnosis",
             "selected_drug",
-            "doctor_name",
-            "doctor_phone",
-            "doctor_email",
+            "doctor",
             "created_at",
-        ]
+        )
 
     def get_created_at(self, instance) -> str:
         return instance.created_at.strftime("%B %d, %Y, %H:%M")
