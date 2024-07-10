@@ -80,8 +80,8 @@ class TradDrugAPIView(APIView):
 
 
 class ReportViewSet(viewsets.ModelViewSet):
-    queryset = Diagnosis.objects.all()
-    authentication_classes = [JWTAuthentication]
+    queryset = Report.objects.all()
+    # authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = ReportSerializer
     filter_backends = [filters.SearchFilter]
@@ -99,29 +99,3 @@ class ReportViewSet(viewsets.ModelViewSet):
         if self.request.user.is_superuser:
             return Report.objects.all()
         return Report.objects.filter(doctor=self.request.user)
-
-    # @action(detail=True, methods=["post"])
-    # def add_drugs(self, request, pk=None):
-      
-    #     traditional_drug_ids = request.data.get("traditional_drug_ids", "").split(",")
-
- 
-    #     if not all(
-    #         TraditionalDrug.objects.filter(id=id).exists()
-    #         for id in traditional_drug_ids
-    #     ):
-    #         raise ValidationError("One or more traditional drug IDs do not exist.")
-
-    #     report = self.get_object()
-
-    #     report.traditional_drug_ids = ",".join(traditional_drug_ids)
-
-    #     # Get the names of the selected traditional drugs
-
-    #     trad_drugs = TraditionalDrug.objects.filter(id__in=traditional_drug_ids)
-    #     selected_drugs = """[drug.product_name for drug in trad_drugs] ="""
-    #     [drug.product_name for drug in trad_drugs]
-    #     report.selected_drug = ", ".join(selected_drugs)
-    #     report.save()
-
-        # return Response(self.get_serializer(report).data)

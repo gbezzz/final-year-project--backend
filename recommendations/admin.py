@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Patient, Diagnosis
+
+from drugInfo.admin import TraditionalDrugAdmin
+from .models import Patient, Diagnosis, Report, TraditionalDrug
 
 # Register your models here.
 
@@ -35,5 +37,28 @@ class DiagnosisAdmin(admin.ModelAdmin):
     )
 
 
+class ReportAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "patient",
+        "diagnosis",
+        "selected_drug",
+        "doctor",
+        "created_at",
+    )
+
+
+class TraditionalDrugAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "product_name",
+        "disease_indications",
+        "adverse_effects",
+        "active_ingredient",
+    )
+
+
 admin.site.register(Patient, PatientAdmin)
 admin.site.register(Diagnosis, DiagnosisAdmin)
+admin.site.register(Report, ReportAdmin)
+admin.site.register(TraditionalDrug, TraditionalDrugAdmin)
