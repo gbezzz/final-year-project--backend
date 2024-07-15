@@ -63,7 +63,7 @@ class TraditionalDrugSerializer(serializers.ModelSerializer):
 
 class ReportSerializer(serializers.ModelSerializer):
 
-    selected_drug = serializers.PrimaryKeyRelatedField(
+    selected_traditional_drug = serializers.PrimaryKeyRelatedField(
         queryset=TraditionalDrug.objects.all()
     )
 
@@ -73,7 +73,8 @@ class ReportSerializer(serializers.ModelSerializer):
             "id",
             "patient",
             "diagnosis",
-            "selected_drug",
+            "selected_orthodox_drug",
+            "selected_traditional_drug",
             "doctor",
             "created_at",
         ]

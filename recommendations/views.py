@@ -42,6 +42,10 @@ class DiagnosisViewSet(viewsets.ModelViewSet):
     authentication_classes = [JWTAuthentication]
     serializer_class = DiagnosisSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = [
+        "diagnosis_made",
+    ]
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -69,7 +73,7 @@ class DiagnosisViewSet(viewsets.ModelViewSet):
 class TradDrugAPIView(APIView):
     def get_object(self, pk):
         try:
-            return TraditionalDrug.objects.filter(disease_indications__icontains=pk)
+            return TraditionalDrug.objects.filter(disease_indications__icontains=pk) if not pk.isdigit() else TraditionalDrug.objects.filter(id__icontains=int(pk))
         except TraditionalDrug.DoesNotExist:
             raise NotFound(detail="Traditional drug not found")
 

@@ -138,7 +138,8 @@ class Report(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     doctor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     diagnosis = models.ForeignKey(Diagnosis, on_delete=models.CASCADE)
-    selected_drug = models.ForeignKey(TraditionalDrug, on_delete=models.CASCADE)
+    selected_orthodox_drug = models.CharField(max_length=100, null=True)
+    selected_traditional_drug = models.ForeignKey(TraditionalDrug, on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
