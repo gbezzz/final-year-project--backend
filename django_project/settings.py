@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     # Local apps
     "accounts.apps.AccountsConfig",
     "recommendations.apps.RecommendationsConfig",
-    "histories.apps.HistoriesConfig",
     "drugInfo.apps.DrugInfoConfig",
     # 3rd-party apps
     "django_extensions",
@@ -115,15 +114,17 @@ DATABASES = {
         "HOST": "localhost",
         "PORT": "5432",
     },
-    # "mongodb": {
-    #     "ENGINE": "djongo",
-    #     "NAME": "sample_medicines",
-    #     "ENFORCE_SCHEMA": False,
-    #     "CLIENT": {
-    #         "host": "mongodb://mongo:vHaTKDCiGQcxxmQitkviXTNKvGeMGnIT@viaduct.proxy.rlwy.net:59093/"
-    #     },
-    # },
+    "mongodb": {
+        "ENGINE": "djongo",
+        "NAME": "sample_medicines",
+        "ENFORCE_SCHEMA": False,
+        "CLIENT": {
+            "host": "mongodb://localhost:27017/"
+        },
+    },
 }
+
+
 
 
 # Password validation
@@ -144,7 +145,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# DATABASE_ROUTERS = ["drugInfo.dbrouters.MyDBRouter"]
+DATABASE_ROUTERS = ["drugInfo.dbrouters.MyDBRouter"]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -179,7 +180,7 @@ REST_FRAMEWORK = {
         # "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 100,
+    # "PAGE_SIZE": 100,
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
@@ -205,4 +206,4 @@ SPECTACULAR_SETTINGS = {
 
 ACCOUNT_EMAIL_VERIFICATION = "none"
 
-# AUTHENTICATION_BACKENDS = ['django_project.backends.UserIDBackend']
+

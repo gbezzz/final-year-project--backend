@@ -103,21 +103,6 @@ class Diagnosis(models.Model):
         return f"Diagnosis for {self.patient.first_name} {self.patient.last_name} by Dr. {self.doctor_name}: {self.diagnosis_made}"
 
 
-# Signal to create a new History instance after a Diagnose instance is created
-# @receiver(post_save, sender=Diagnosis)
-# def create_history(sender, instance, created, **kwargs):
-#     if created:
-#         History.objects.create(
-#             patient=instance.patient,
-#             patient_id=instance.patient_id,
-#             diagnose=instance,
-#             diagnosis_made=instance.diagnosis_made,
-#             selected_drug=instance.selected_drug,
-#             doctor_name=instance.doctor_name,
-#             doctor_email=instance.doctor_email,
-#             doctor_phone=instance.doctor_phone,
-#             created_at=instance.created_at,
-#         )
 
 
 class TraditionalDrug(models.Model):
@@ -139,8 +124,9 @@ class Report(models.Model):
     doctor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     diagnosis = models.ForeignKey(Diagnosis, on_delete=models.CASCADE)
     selected_orthodox_drug = models.CharField(max_length=100, null=True)
-    selected_traditional_drug = models.ForeignKey(TraditionalDrug, on_delete=models.CASCADE, null=True)
+    selected_traditional_drug = models.ManyToManyField(TraditionalDrug)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Report for {self.diagnosis.patient.first_name} {self.diagnosis.patient.last_name} by Dr. {self.diagnosis.doctor_name} on {self.created_at.strftime('%Y-%m-%d')}"
+

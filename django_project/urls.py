@@ -31,36 +31,28 @@ from drf_spectacular.views import (
 # from recommendations.views import RecommendTradDrugView
 
 urlpatterns = [
-    # path(
-    #     "api/recommendations/",
-    #     RecommendTradDrugView.as_view(),
-    #     name="recommend-trad-drugs",
-    # ),
+
     path("admin/", admin.site.urls),
     path("api/users/", include("accounts.urls")),
-    path("api-auth/", include("rest_framework.urls")),
-    path("api/dj-rest-auth/", include("dj_rest_auth.urls")),
-    path("api/dj-rest-auth/registration/", include("dj_rest_auth.registration.urls")),
-    path(
-        "api/password/reset/confirm/<str:uidb64>/<str:token>/",
-        PasswordResetConfirmView.as_view(),
-        name="password_reset_confirm",
-    ),
+    # path("api-auth/", include("rest_framework.urls")),
+    # path("api/dj-rest-auth/", include("dj_rest_auth.urls")),
+    # path("api/dj-rest-auth/registration/", include("dj_rest_auth.registration.urls")),
+   
     path("api/recommendations/", include("recommendations.urls")),
-    path("api/report-history/", include("histories.urls")),
+
     path("api/drug-info/", include("drugInfo.urls")),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
-        "api/schema/redoc/",
-        SpectacularRedocView.as_view(url_name="schema"),
-        name="redoc",
-    ),
-    path(
         "api/schema/swagger-ui/",
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
-    path("api/drug-info/", include("drugInfo.urls")),
+     path(
+        "api/password/reset/confirm/<str:uidb64>/<str:token>/",
+        PasswordResetConfirmView.as_view(),
+        name="password_reset_confirm",
+    ),
+
 ]

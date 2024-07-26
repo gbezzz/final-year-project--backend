@@ -44,6 +44,7 @@ class DiagnosisSerializer(serializers.ModelSerializer):
             "diagnosis_made",
             "created_at",
         ]
+    
 
     def get_created_at(self, instance):
         return instance.created_at.strftime("%B %d, %Y, %H:%M")
@@ -62,9 +63,12 @@ class TraditionalDrugSerializer(serializers.ModelSerializer):
 
 
 class ReportSerializer(serializers.ModelSerializer):
-
+    diagnosis = serializers.PrimaryKeyRelatedField(queryset=Diagnosis.objects.all(), many=True)
+    selected_orthodox_drug = serializers.ListField(
+       child = serializers.CharField()
+    )
     selected_traditional_drug = serializers.PrimaryKeyRelatedField(
-        queryset=TraditionalDrug.objects.all()
+        queryset=TraditionalDrug.objects.all(), many=True
     )
 
     class Meta:

@@ -42,8 +42,8 @@ class ReportAdmin(admin.ModelAdmin):
         "id",
         "patient",
         "diagnosis",
-        "selected_orthodox_drug",
-        "selected_traditional_drug",
+        # "selected_orthodox_drug",
+        # "selected_traditional_drug",
         "doctor",
         "created_at",
     )

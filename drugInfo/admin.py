@@ -8,7 +8,7 @@ class OrthodoxDrugAdmin(admin.ModelAdmin):
         "name",
         "description",
         "cas_number",
-        "unii",
+        
         "state",
         # "groups",
         # "general_references",
