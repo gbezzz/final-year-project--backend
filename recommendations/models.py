@@ -70,7 +70,6 @@ class Vitals(models.Model):
     )
 
     temperature = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
-   
     systolic = models.IntegerField( null=True, blank=True)
     diastolic = models.IntegerField(null=True, blank=True)
     heart_rate = models.IntegerField(null=True, blank=True)
@@ -148,7 +147,7 @@ class Report(models.Model):
     id = models.AutoField(primary_key=True)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     doctor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    diagnosis = models.ForeignKey(Diagnosis, on_delete=models.CASCADE)
+    diagnosis = models.ManyToManyField(Diagnosis)
     selected_orthodox_drug = models.CharField(max_length=100, null=True)
     selected_traditional_drug = models.ManyToManyField(TraditionalDrug)
     created_at = models.DateTimeField(auto_now_add=True)

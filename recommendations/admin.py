@@ -41,7 +41,7 @@ class ReportAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "patient",
-        "diagnosis",
+        # "diagnosis",
         # "selected_orthodox_drug",
         # "selected_traditional_drug",
         "doctor",
