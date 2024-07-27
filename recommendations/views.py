@@ -1,11 +1,11 @@
 from django.shortcuts import render, get_object_or_404
-from rest_framework import viewsets, filters, serializers, status
+from rest_framework import viewsets, filters, serializers, status, generics
 from .models import Patient, Diagnosis, Report, Vitals
 from .serializers import (
     PatientSerializer,
     DiagnosisSerializer,
     ReportSerializer,
-    TraditionalDrugSerializer,
+    TradDrugSerializer,
     VitalsSerializer,
 )
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -62,16 +62,18 @@ class DiagnosisViewSet(viewsets.ModelViewSet):
             doctor_email=user.email,
         )
 
-    @api_view(["GET"])
-    def select_drugs(self, request, pk):
-        recommend_drugs_view = TradDrugAPIView()
-        disease_indications = int(pk)
-        response = recommend_drugs_view.get(id=disease_indications)
+    # @api_view(["GET"])
+    # def select_drugs(self, request, pk):
+    #     recommend_drugs_view = TradDrugAPIView()
+    #     disease_indications = int(pk)
+    #     response = recommend_drugs_view.get(id=disease_indications)
 
-        return Response(response.data)
+    #     return Response(response.data)
 
 
-class TradDrugAPIView(APIView):
+class TradDrugAPIView(generics.RetrieveAPIView):
+    queryset = TraditionalDrug.objects.all()
+    serializer_class = TradDrugSerializer
     def get_object(self, pk):
         try:
             return TraditionalDrug.objects.filter(disease_indications__icontains=pk) if not pk.isdigit() else TraditionalDrug.objects.filter(id__icontains=int(pk))
@@ -80,7 +82,7 @@ class TradDrugAPIView(APIView):
 
     def get(self, request, pk, *args, **kwargs):
         trad_drugs = self.get_object(pk)
-        serializer = TraditionalDrugSerializer(trad_drugs, many=True)
+        serializer = TradDrugSerializer(trad_drugs, many=True)
         return Response(serializer.data)
 
 

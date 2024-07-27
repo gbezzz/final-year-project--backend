@@ -4,6 +4,8 @@ from rest_framework import serializers
 from .models import Patient, Vitals, Diagnosis, Report, TraditionalDrug
 from accounts.models import CustomUser
 from accounts.serializers import UserSerializer
+from rest_framework.exceptions import ValidationError 
+
 
 
 class PatientSerializer(serializers.ModelSerializer):
@@ -74,7 +76,7 @@ class DiagnosisSerializer(serializers.ModelSerializer):
         return instance.created_at.strftime("%B %d, %Y, %H:%M")
 
 
-class TraditionalDrugSerializer(serializers.ModelSerializer):
+class TradDrugSerializer(serializers.ModelSerializer):
     class Meta:
         model = TraditionalDrug
         fields = [
