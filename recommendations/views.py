@@ -104,35 +104,3 @@ class ReportViewSet(viewsets.ModelViewSet):
             return Report.objects.all()
         return Report.objects.filter(doctor=self.request.user)
 
-
-# class ReportViewSet(viewsets.ModelViewSet):
-#     queryset = Report.objects.all()
-#     serializer_class = ReportSerializer
-#     permission_classes = [IsAuthenticated]
-
-#     def create(self, request, *args, **kwargs):
-#         reports_data = request.data.get('diagnoses', [])
-#         created_reports = []
-
-#         for data in reports_data:
-#             diagnosis_queryset = Diagnosis.objects.filter(diagnosis_made=data['diagnosis'])
-#             if not diagnosis_queryset.exists():
-#                 # Handle case where the diagnosis does not exist
-#                 continue
-
-#             diagnosis = diagnosis_queryset.first()
-
-#             report_data = {
-#                 'patient_id': request.data.get('patient_id'),
-#                 'doctor_id': request.data.get('doctor_id'),
-#                 'diagnosis_id': diagnosis.id,
-#                 'selected_orthodox_drug': data.get('selected_orthodox_drug'),
-#                 'selected_traditional_drug': data.get('selected_traditional_drug'),
-#             }
-
-#             serializer = self.get_serializer(data=report_data)
-#             serializer.is_valid(raise_exception=True)
-#             self.perform_create(serializer)
-#             created_reports.append(serializer.data)
-
-#         return Response(created_reports, status=status.HTTP_201_CREATED)

@@ -92,3 +92,25 @@ class ReportSerializer(serializers.ModelSerializer):
     def get_patient_age(self, obj) -> str:
         age = obj.patient.age
         return f"{age['years']} years, {age['months']} months, and {age['days']} days"
+
+    def create(self, validated_data):
+        diagnosis_data = validated_data.pop('diagnosis', None)
+        if diagnosis_data is None:
+            raise ValidationError({"diagnosis": "This field is required."})
+
+        patient_data = validated_data.pop('patient', None)
+        if patient_data is None:
+            raise ValidationError({"patient": "This field is required."})
+
+        try:
+            diagnosis, created = Diagnosis.objects.get_or_create(**diagnosis_data)
+        except Exception as e:
+            raise ValidationError({"diagnosis": str(e)})
+
+        try:
+            patient = Patient.objects.get(pid=patient_data['pid'])
+        except Patient.DoesNotExist:
+            raise ValidationError({"patient": "Patient with the given pid does not exist."})
+
+        report = Report.objects.create(diagnosis=diagnosis, patient=patient, **validated_data)
+        return report
