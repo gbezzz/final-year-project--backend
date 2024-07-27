@@ -1,7 +1,7 @@
 from os import read
 from pickle import TRUE
 from rest_framework import serializers
-from .models import Patient, Diagnosis, Report, TraditionalDrug
+from .models import Patient, Vitals, Diagnosis, Report, TraditionalDrug
 from accounts.models import CustomUser
 from accounts.serializers import UserSerializer
 
@@ -20,7 +20,6 @@ class PatientSerializer(serializers.ModelSerializer):
             "sex",
             "date_of_birth",
             "age",
-            "weight",
             "phone_number",
             "email",
             "address",
@@ -30,10 +29,29 @@ class PatientSerializer(serializers.ModelSerializer):
         age = obj.age
         return f"{age['years']} years, {age['months']} months, and {age['days']} days"
 
+class VitalsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vitals
+        fields = [
+            "id",
+            "weight",
+            "temperature",
+            "systolic",
+            "diastolic",
+            "heart_rate",
+            "pulse_rhythm",
+            "pulse_strength",
+            "respiratory_rate",
+            "breathing_difficulty",
+            "oxygen_saturation",
+            "recorded_at",
+            
+        ]
+
 
 class DiagnosisSerializer(serializers.ModelSerializer):
     diagnosis_identifier = serializers.CharField(read_only=TRUE)
-
+    vitals = serializers.PrimaryKeyRelatedField(queryset=Vitals.objects.all())
     class Meta:
         model = Diagnosis
         fields = [
@@ -41,7 +59,13 @@ class DiagnosisSerializer(serializers.ModelSerializer):
             "patient",
             "doctor",
             "diagnosis_identifier",
+            "vitals",
+            "medical_history",
+            "allergies",
+            "symptoms",
+            "current_medications",
             "diagnosis_made",
+            "extra_notes",
             "created_at",
         ]
     

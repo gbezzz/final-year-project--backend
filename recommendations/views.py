@@ -1,11 +1,12 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets, filters, serializers, status
-from .models import Patient, Diagnosis, Report
+from .models import Patient, Diagnosis, Report, Vitals
 from .serializers import (
     PatientSerializer,
     DiagnosisSerializer,
     ReportSerializer,
     TraditionalDrugSerializer,
+    VitalsSerializer,
 )
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -85,7 +86,7 @@ class TradDrugAPIView(APIView):
 
 class ReportViewSet(viewsets.ModelViewSet):
     queryset = Report.objects.all()
-    # authentication_classes = [JWTAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = ReportSerializer
     filter_backends = [filters.SearchFilter]
@@ -104,3 +105,8 @@ class ReportViewSet(viewsets.ModelViewSet):
             return Report.objects.all()
         return Report.objects.filter(doctor=self.request.user)
 
+class VitalsViewSet(viewsets.ModelViewSet):
+    queryset = Vitals.objects.all()
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = VitalsSerializer

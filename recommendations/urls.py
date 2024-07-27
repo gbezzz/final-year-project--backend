@@ -4,6 +4,7 @@ from .views import (
     PatientViewSet,
     DiagnosisViewSet,
     ReportViewSet,
+    VitalsViewSet,
     TradDrugAPIView,
 )
 
@@ -12,6 +13,8 @@ router = DefaultRouter()
 router.register(r"patients", PatientViewSet, basename="patients")
 router.register(r"diagnosis", DiagnosisViewSet, basename="diagnosis")
 router.register(r"reports", ReportViewSet, basename="reports")
+router.register(r"vitals", VitalsViewSet, basename="vitals")
+
 
 
 urlpatterns = [
