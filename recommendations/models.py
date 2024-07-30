@@ -128,7 +128,13 @@ class Diagnosis(models.Model):
         return f"Diagnosis for {self.patient.first_name} {self.patient.last_name} by Dr. {self.doctor_name}: {self.diagnosis_made}"
 
 
+class OrthodoxDrug(models.Model):
 
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=1000, null=True)
+
+    def __str__(self):
+        return self.name
 
 class TraditionalDrug(models.Model):
 
@@ -148,7 +154,7 @@ class Report(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     doctor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     diagnosis = models.ManyToManyField(Diagnosis)
-    selected_orthodox_drug = models.CharField(max_length=100, null=True)
+    selected_orthodox_drug = models.ManyToManyField(OrthodoxDrug)
     selected_traditional_drug = models.ManyToManyField(TraditionalDrug)
     created_at = models.DateTimeField(auto_now_add=True)
 

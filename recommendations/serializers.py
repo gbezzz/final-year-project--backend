@@ -1,7 +1,7 @@
 from os import read
 from pickle import TRUE
 from rest_framework import serializers
-from .models import Patient, Vitals, Diagnosis, Report, TraditionalDrug
+from .models import Patient, Vitals, Diagnosis, Report, TraditionalDrug, OrthodoxDrug
 from accounts.models import CustomUser
 from accounts.serializers import UserSerializer
 from rest_framework.exceptions import ValidationError 
@@ -35,7 +35,7 @@ class VitalsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vitals
         fields = [
-            "id",
+            "patient",
             "weight",
             "temperature",
             "systolic",
@@ -90,8 +90,8 @@ class TradDrugSerializer(serializers.ModelSerializer):
 
 class ReportSerializer(serializers.ModelSerializer):
     diagnosis = serializers.PrimaryKeyRelatedField(queryset=Diagnosis.objects.all(), many=True)
-    selected_orthodox_drug = serializers.ListField(
-       child = serializers.CharField()
+    selected_orthodox_drug = serializers.PrimaryKeyRelatedField(
+        queryset=OrthodoxDrug.objects.all(), many=True
     )
     selected_traditional_drug = serializers.PrimaryKeyRelatedField(
         queryset=TraditionalDrug.objects.all(), many=True
@@ -120,23 +120,35 @@ class ReportSerializer(serializers.ModelSerializer):
         return f"{age['years']} years, {age['months']} months, and {age['days']} days"
 
     def create(self, validated_data):
-        diagnosis_data = validated_data.pop('diagnosis', None)
-        if diagnosis_data is None:
-            raise ValidationError({"diagnosis": "This field is required."})
+        diagnosis_data = validated_data.pop('diagnosis', [])
+        selected_orthodox_drug_data = validated_data.pop('selected_orthodox_drug', [])
+        selected_traditional_drug_data = validated_data.pop('selected_traditional_drug', [])
 
-        patient_data = validated_data.pop('patient', None)
-        if patient_data is None:
-            raise ValidationError({"patient": "This field is required."})
+        report = Report.objects.create(**validated_data)
 
-        try:
-            diagnosis, created = Diagnosis.objects.get_or_create(**diagnosis_data)
-        except Exception as e:
-            raise ValidationError({"diagnosis": str(e)})
+        if diagnosis_data:
+            report.diagnosis.set(diagnosis_data)
+        if selected_orthodox_drug_data:
+            report.selected_orthodox_drug.set(selected_orthodox_drug_data)
+        if selected_traditional_drug_data:
+            report.selected_traditional_drug.set(selected_traditional_drug_data)
 
-        try:
-            patient = Patient.objects.get(pid=patient_data['pid'])
-        except Patient.DoesNotExist:
-            raise ValidationError({"patient": "Patient with the given pid does not exist."})
-
-        report = Report.objects.create(diagnosis=diagnosis, patient=patient, **validated_data)
         return report
+
+    def update(self, instance, validated_data):
+        diagnosis_data = validated_data.pop('diagnosis', None)
+        selected_orthodox_drug_data = validated_data.pop('selected_orthodox_drug', None)
+        selected_traditional_drug_data = validated_data.pop('selected_traditional_drug', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        if diagnosis_data is not None:
+            instance.diagnosis.set(diagnosis_data)
+        if selected_orthodox_drug_data is not None:
+            instance.selected_orthodox_drug.set(selected_orthodox_drug_data)
+        if selected_traditional_drug_data is not None:
+            instance.selected_traditional_drug.set(selected_traditional_drug_data)
+
+        instance.save()
+        return instance
